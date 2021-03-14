@@ -83,7 +83,6 @@ class __WidgetState extends State<_Widget> {
   Future _pickUnit() async {
     final time = widget.state.value ?? TimeOfDay.now();
     final attachment = widget.attachmentBuilder?.call(context, 'timer_text_form_field');
-
     final value = await showTimePicker(
       context: context,
       initialTime: time,

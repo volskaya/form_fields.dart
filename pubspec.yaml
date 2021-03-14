@@ -42,4 +42,5 @@ dependency_overrides:
     path: /home/projects/forks/mobx.dart/mobx_codegen
 
 flutter:
+  assets:
     - assets/flags/
