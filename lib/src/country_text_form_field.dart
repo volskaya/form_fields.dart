@@ -23,7 +23,6 @@ class CountryTextFormField extends FormField<Country> {
     InputDecoration decoration,
     TextStyle style,
     FormFieldAttachmentBuilder attachmentBuilder,
-    IconData flagIcon = Icons.flag,
   }) : super(
           key: key,
           onSaved: onSaved,
@@ -39,9 +38,10 @@ class CountryTextFormField extends FormField<Country> {
             decoration: decoration,
             style: style,
             attachmentBuilder: attachmentBuilder,
-            flagIcon: flagIcon,
           ),
         );
+
+  static IconData flagIcon = Icons.flag;
 }
 
 class _Widget extends StatefulWidget {
@@ -53,7 +53,6 @@ class _Widget extends StatefulWidget {
     this.decoration,
     this.style,
     this.attachmentBuilder,
-    this.flagIcon = Icons.flag,
   });
 
   final FormFieldState<Country> state;
@@ -63,7 +62,6 @@ class _Widget extends StatefulWidget {
   final InputDecoration decoration;
   final TextStyle style;
   final FormFieldAttachmentBuilder attachmentBuilder;
-  final IconData flagIcon;
 
   @override
   __WidgetState createState() => __WidgetState();
@@ -125,7 +123,7 @@ class __WidgetState extends State<_Widget> {
                           ),
                           type: SwitchingImageType.fade,
                           fit: BoxFit.contain,
-                          idleChild: Icon(widget.flagIcon, size: 12),
+                          idleChild: Icon(CountryTextFormField.flagIcon, size: 12),
                           addRepaintBoundary: false,
                         ),
                       ),
@@ -206,7 +204,7 @@ class __WidgetState extends State<_Widget> {
             type: SwitchingImageType.scale,
             fit: BoxFit.contain,
             idleChild: Center(
-              child: Icon(widget.flagIcon),
+              child: Icon(CountryTextFormField.flagIcon),
             ),
           ),
         ),

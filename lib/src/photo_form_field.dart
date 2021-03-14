@@ -32,7 +32,6 @@ class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue>> {
     PhotoFormFieldIdleBuilder idleBuilder,
     BorderRadius borderRadius,
     Duration switchDuration = const Duration(milliseconds: 250),
-    IconData photoIcon = Icons.image,
   }) : super(
           onSaved: onSaved,
           validator: validator,
@@ -47,10 +46,10 @@ class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue>> {
             idleBuilder: idleBuilder,
             borderRadius: borderRadius,
             switchDuration: switchDuration,
-            photoIcon: photoIcon,
           ),
         );
 
+  static IconData photoIcon = Icons.image;
   static int maxSecondaryPhotos = 4;
 
   static Future<File> pickImage({bool useCamera = false}) async {
@@ -82,7 +81,6 @@ class _Widget extends StatelessWidget {
     this.idleBuilder,
     this.borderRadius,
     this.switchDuration = const Duration(milliseconds: 250),
-    this.photoIcon = Icons.image,
   }) : super(key: key);
 
   final FormFieldState<Map<int, PhotoFormFieldValue>> state;
@@ -92,7 +90,6 @@ class _Widget extends StatelessWidget {
   final PhotoFormFieldIdleBuilder idleBuilder;
   final BorderRadius borderRadius;
   final Duration switchDuration;
-  final IconData photoIcon;
 
   static final _log = Log.named('PhotoFormField');
 
@@ -119,7 +116,7 @@ class _Widget extends StatelessWidget {
       alignment: Alignment.center,
       child: interactive
           ? Icon(
-              photoIcon,
+              PhotoFormField.photoIcon,
               size: index == 0 ? 48.0 : 24.0,
               color: !state.hasError ? theme.hintColor : theme.colorScheme.error,
             )

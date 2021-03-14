@@ -27,7 +27,6 @@ class PhoneTextFormField extends FormField<String> {
     InputDecoration decoration,
     TextStyle style,
     FormFieldAttachmentBuilder attachmentBuilder,
-    IconData flagIcon = Icons.flag,
   }) : super(
           key: key,
           onSaved: onSaved,
@@ -45,9 +44,10 @@ class PhoneTextFormField extends FormField<String> {
             readOnly: readOnly,
             style: style,
             attachmentBuilder: attachmentBuilder,
-            flagIcon: flagIcon,
           ),
         );
+
+  static IconData flagIcon = Icons.flag;
 }
 
 class _Widget extends StatefulWidget {
@@ -61,7 +61,6 @@ class _Widget extends StatefulWidget {
     this.style,
     this.readOnly = false,
     this.attachmentBuilder,
-    this.flagIcon = Icons.flag,
   });
 
   final FormFieldState<String> state;
@@ -73,7 +72,6 @@ class _Widget extends StatefulWidget {
   final TextStyle style;
   final bool readOnly;
   final FormFieldAttachmentBuilder attachmentBuilder;
-  final IconData flagIcon;
 
   @override
   __WidgetState createState() => __WidgetState();
@@ -157,7 +155,7 @@ class __WidgetState extends State<_Widget> {
                           ),
                           type: SwitchingImageType.fade,
                           fit: BoxFit.contain,
-                          idleChild: Icon(widget.flagIcon, size: 12),
+                          idleChild: Icon(PhoneTextFormField.flagIcon, size: 12),
                           addRepaintBoundary: false,
                         ),
                       ),
@@ -238,7 +236,7 @@ class __WidgetState extends State<_Widget> {
           type: SwitchingImageType.scale,
           fit: BoxFit.contain,
           idleChild: Center(
-            child: Icon(widget.flagIcon),
+            child: Icon(PhoneTextFormField.flagIcon),
           ),
         ),
       ),
