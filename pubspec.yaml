@@ -40,3 +40,6 @@ dependency_overrides:
     path: /home/projects/forks/freezed/packages/freezed
   mobx_codegen:
     path: /home/projects/forks/mobx.dart/mobx_codegen
+
+flutter:
+    - assets/flags/
