@@ -41,6 +41,9 @@ class TimerTextFormField extends FormField<TimeOfDay> {
             attachmentBuilder: attachmentBuilder,
           ),
         );
+
+  static IconData dialIcon = Icons.access_time;
+  static IconData inputIcon = Icons.keyboard;
 }
 
 class _Widget extends StatefulWidget {
@@ -80,12 +83,23 @@ class __WidgetState extends State<_Widget> {
     widget.state.didChange(value);
   }
 
+  IconData _getIcon(TimePickerEntryMode mode) {
+    switch (mode) {
+      case TimePickerEntryMode.dial:
+        return TimerTextFormField.inputIcon;
+      case TimePickerEntryMode.input:
+        return TimerTextFormField.dialIcon;
+    }
+    throw UnimplementedError();
+  }
+
   Future _pickUnit() async {
     final time = widget.state.value ?? TimeOfDay.now();
     final attachment = widget.attachmentBuilder?.call(context, 'timer_text_form_field');
     final value = await showTimePicker(
       context: context,
       initialTime: time,
+      getIcon: _getIcon,
       dialogBuilder: (_, builder) => showModal<TimeOfDay>(
         context: context,
         builder: (context) => Padding(
