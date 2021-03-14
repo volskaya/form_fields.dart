@@ -119,7 +119,7 @@ class __WidgetState extends State<_Widget> {
                         builder: (_, context) => SwitchingImage(
                           imageProvider: ScrollAwareImageProvider(
                             context: context,
-                            imageProvider: Country.imageOf(country),
+                            imageProvider: Country.imageOf(country, package: 'form_fields'),
                           ),
                           type: SwitchingImageType.fade,
                           fit: BoxFit.contain,
@@ -188,29 +188,24 @@ class __WidgetState extends State<_Widget> {
     super.dispose();
   }
 
-  Widget _buildFlag(ThemeData theme, [Country country]) {
-    final image =
-        isNotEmpty(country?.alphaCode2) ? AssetImage('assets/flags/${country.alphaCode2.toLowerCase()}.png') : null;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: SizedBox(
-        height: 40,
-        width: 32.0,
-        child: Tooltip(
-          message: 'Pick country',
-          child: SwitchingImage(
-            imageProvider: image,
-            type: SwitchingImageType.scale,
-            fit: BoxFit.contain,
-            idleChild: Center(
-              child: Icon(CountryTextFormField.flagIcon),
+  Widget _buildFlag(ThemeData theme, [Country country]) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: SizedBox(
+          height: 40,
+          width: 32.0,
+          child: Tooltip(
+            message: 'Pick country',
+            child: SwitchingImage(
+              imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country, package: 'form_fields') : null,
+              type: SwitchingImageType.scale,
+              fit: BoxFit.contain,
+              idleChild: Center(
+                child: Icon(CountryTextFormField.flagIcon),
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   @override
   Widget build(BuildContext context) {

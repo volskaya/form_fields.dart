@@ -151,7 +151,7 @@ class __WidgetState extends State<_Widget> {
                         builder: (_, context) => SwitchingImage(
                           imageProvider: ScrollAwareImageProvider(
                             context: context,
-                            imageProvider: Country.imageOf(country),
+                            imageProvider: Country.imageOf(country, package: 'form_fields'),
                           ),
                           type: SwitchingImageType.fade,
                           fit: BoxFit.contain,
@@ -222,26 +222,22 @@ class __WidgetState extends State<_Widget> {
     if (_shouldDisposeFocusNode) _focusNode?.dispose();
   }
 
-  Widget _buildFlag(ThemeData theme, [Country country]) {
-    final image = isNotEmpty(country?.alphaCode2) ? Country.imageOf(country) : null;
-
-    return IconButton(
-      tooltip: 'Pick a country code',
-      onPressed: !widget.readOnly ? _pickCountry : null,
-      icon: SizedBox(
-        width: 24.0,
-        height: 32.0,
-        child: SwitchingImage(
-          imageProvider: image,
-          type: SwitchingImageType.scale,
-          fit: BoxFit.contain,
-          idleChild: Center(
-            child: Icon(PhoneTextFormField.flagIcon),
+  Widget _buildFlag(ThemeData theme, [Country country]) => IconButton(
+        tooltip: 'Pick a country code',
+        onPressed: !widget.readOnly ? _pickCountry : null,
+        icon: SizedBox(
+          width: 24.0,
+          height: 32.0,
+          child: SwitchingImage(
+            imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country, package: 'form_fields') : null,
+            type: SwitchingImageType.scale,
+            fit: BoxFit.contain,
+            idleChild: Center(
+              child: Icon(PhoneTextFormField.flagIcon),
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   @override
   Widget build(BuildContext context) {
