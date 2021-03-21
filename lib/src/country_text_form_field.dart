@@ -69,7 +69,7 @@ class _Widget extends StatefulWidget {
   __WidgetState createState() => __WidgetState();
 }
 
-class __WidgetState extends State<_Widget> {
+class __WidgetState extends State<_Widget> with InitialDependencies {
   bool _shouldDisposeController = false;
   bool _shouldDisposeFocusNode = false;
   TextEditingController _controller;
@@ -176,12 +176,14 @@ class __WidgetState extends State<_Widget> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void initDependencies() {
     _shouldDisposeController = widget.controller == null;
     _shouldDisposeFocusNode = widget.focusNode == null;
-    _controller = widget.controller ?? TextEditingController(text: widget.state.value?.name ?? '');
     _focusNode = widget.focusNode ?? FocusNode();
+    _controller = widget.controller ??
+        TextEditingController(
+          text: widget.state.value?.name != null ? Country.localize(context, widget.state.value) : '',
+        );
   }
 
   @override
