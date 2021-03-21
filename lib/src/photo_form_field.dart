@@ -97,7 +97,7 @@ class _Widget extends StatelessWidget {
     final photo = !remove ? await PhotoFormField.pickImage() : null;
 
     if (photo == null && !remove) {
-      return _log.v('Picker returned no image, skipping…');
+      return _log.w('Picker returned no image, skipping…');
     } else if (id == 0 && photo == null) {
       // Main photo deleted
       state.didChange(const <int, PhotoFormFieldValue>{});
@@ -172,7 +172,7 @@ class _Widget extends StatelessWidget {
         children: <Widget>[
           _buildImage(theme),
 
-          // Error message
+          // Error message.
           Positioned(
             bottom: 16,
             right: 16,

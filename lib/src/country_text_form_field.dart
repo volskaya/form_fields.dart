@@ -1,5 +1,7 @@
 import 'package:animations/animations.dart';
+import 'package:country_catalog/country_catalog.dart';
 import 'package:fancy_switcher/fancy_switcher.dart';
+import 'package:form_fields/src/l10n/form_fields_localizations.dart';
 import 'package:form_fields/src/typedefs.dart';
 import 'package:material_dialog/material_dialog.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -74,7 +76,7 @@ class __WidgetState extends State<_Widget> {
   FocusNode _focusNode;
 
   void _updateCountry([Country country]) {
-    _controller.text = country?.name ?? '';
+    _controller.text = country?.name != null ? Country.localize(context, country) : '';
     widget.onChanged?.call(country);
     widget.state.didChange(country);
   }
@@ -89,15 +91,16 @@ class __WidgetState extends State<_Widget> {
         context: context,
         builder: (context) {
           final theme = Theme.of(context);
+          final strings = MaterialLocalizations.of(context);
           final buttons = [
             TextButton(
-              child: const Text('CANCEL', layoutTwice: true),
+              child: Text(strings.cancelButtonLabel, layoutTwice: true),
               onPressed: () => Navigator.pop(context),
             ),
             ValueListenableBuilder<Country>(
               valueListenable: notifier,
               builder: (_, selectedValue, child) => TextButton(
-                child: const Text('OK', layoutTwice: true),
+                child: Text(strings.okButtonLabel, layoutTwice: true),
                 onPressed: selectedValue != null ? () => Navigator.pop(context, notifier.value) : null,
               ),
             ),
@@ -111,7 +114,7 @@ class __WidgetState extends State<_Widget> {
                 delegate: SliverChildBuilderDelegate(
                   (context, i) {
                     final country = CountryCatalog.countries[i];
-                    final title = Text(country.name, overflow: TextOverflow.ellipsis);
+                    final title = Text(Country.localize(context, country), overflow: TextOverflow.ellipsis);
                     final flag = SizedBox(
                       height: 24.0,
                       width: 24.0,
@@ -157,8 +160,8 @@ class __WidgetState extends State<_Widget> {
             },
             child: ValueListenableBuilder<bool>(
               valueListenable: scrollToggle,
-              builder: (_, overlapsContent, ___) => MaterialDialogContainer(
-                title: const Text('Country'),
+              builder: (context, overlapsContent, ___) => MaterialDialogContainer(
+                title: Text(FormFieldsLocalizations.of(context).countryDialogTitle),
                 content: content,
                 overlapsContent: overlapsContent,
                 buttons: buttons,
@@ -188,13 +191,13 @@ class __WidgetState extends State<_Widget> {
     super.dispose();
   }
 
-  Widget _buildFlag(ThemeData theme, [Country country]) => Padding(
+  Widget _buildFlag(BuildContext context, ThemeData theme, [Country country]) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: SizedBox(
           height: 40,
           width: 32.0,
           child: Tooltip(
-            message: 'Pick country',
+            message: FormFieldsLocalizations.of(context).countryPickButtonTooltip,
             child: SwitchingImage(
               imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country, package: 'form_fields') : null,
               type: SwitchingImageType.scale,
@@ -223,7 +226,7 @@ class __WidgetState extends State<_Widget> {
       keyboardType: TextInputType.phone,
       decoration: inputDecoration.copyWith(
         errorText: widget.state.hasError ? widget.state.errorText : null,
-        suffixIcon: _buildFlag(theme, widget.state.value),
+        suffixIcon: _buildFlag(context, theme, widget.state.value),
       ),
     );
   }

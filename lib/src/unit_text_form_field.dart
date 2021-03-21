@@ -118,15 +118,16 @@ class __WidgetState<T> extends State<_Widget<T>> {
       context: context,
       builder: (context) {
         final theme = Theme.of(context);
+        final strings = MaterialLocalizations.of(context);
         final buttons = [
           TextButton(
-            child: const Text('CANCEL', layoutTwice: true),
+            child: Text(strings.cancelButtonLabel, layoutTwice: true),
             onPressed: () => Navigator.pop(context),
           ),
           ValueListenableBuilder<T>(
             valueListenable: notifier,
             builder: (_, selectedValue, child) => TextButton(
-              child: const Text('OK', layoutTwice: true),
+              child: Text(strings.okButtonLabel, layoutTwice: true),
               onPressed:
                   (widget.toggleable || selectedValue != null) && (widget.getValueState?.call(selectedValue) ?? true)
                       ? () => Navigator.pop(context, notifier.value)

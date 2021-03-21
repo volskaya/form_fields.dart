@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   json_annotation:
   image_picker: ^0.6.7+4
@@ -24,6 +26,8 @@ dependencies:
     path: /home/projects/packages/flutter_helpers/scrollable_positioned_list
   material_dialog:
     path: /home/projects/packages/flutter_helpers/material_dialog
+  country_catalog:
+    path: /home/projects/packages/country_catalog
 
 dev_dependencies:
   flutter_test:
@@ -34,6 +38,7 @@ dev_dependencies:
   freezed_annotation: ^0.12.0
 
 dependency_overrides:
+  intl: 0.17.0
   freezed_annotation:
     path: /home/projects/forks/freezed/packages/freezed_annotation
   freezed:
@@ -42,6 +47,7 @@ dependency_overrides:
     path: /home/projects/forks/mobx.dart/mobx_codegen
 
 flutter:
+  generate: true
   assets:
     - packages/form_fields/flags/ad.png
     - packages/form_fields/flags/ae.png

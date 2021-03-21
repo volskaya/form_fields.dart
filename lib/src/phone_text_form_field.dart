@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:animations/animations.dart';
+import 'package:country_catalog/country_catalog.dart';
 import 'package:fancy_switcher/fancy_switcher.dart';
+import 'package:form_fields/src/l10n/form_fields_localizations.dart';
 import 'package:form_fields/src/typedefs.dart';
 import 'package:utils/utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -136,7 +138,7 @@ class __WidgetState extends State<_Widget> {
                 delegate: SliverChildBuilderDelegate(
                   (context, i) {
                     final country = CountryCatalog.countries[i];
-                    final title = Text(country.name, overflow: TextOverflow.ellipsis);
+                    final title = Text(Country.localize(context, country), overflow: TextOverflow.ellipsis);
                     final leading = SizedBox(
                       height: 40.0,
                       width: 48.0,
@@ -187,8 +189,8 @@ class __WidgetState extends State<_Widget> {
             },
             child: ValueListenableBuilder<bool>(
               valueListenable: scrollToggle,
-              builder: (_, overlapsContent, ___) => MaterialDialogContainer(
-                title: const Text('Country code'),
+              builder: (context, overlapsContent, ___) => MaterialDialogContainer(
+                title: Text(FormFieldsLocalizations.of(context).phoneCountryDialogTitle),
                 content: content,
                 overlapsContent: overlapsContent,
                 attachment: attachment,
@@ -222,8 +224,8 @@ class __WidgetState extends State<_Widget> {
     if (_shouldDisposeFocusNode) _focusNode?.dispose();
   }
 
-  Widget _buildFlag(ThemeData theme, [Country country]) => IconButton(
-        tooltip: 'Pick a country code',
+  Widget _buildFlag(BuildContext context, ThemeData theme, [Country country]) => IconButton(
+        tooltip: FormFieldsLocalizations.of(context).phoneCountryCodeButtonTooltip,
         onPressed: !widget.readOnly ? _pickCountry : null,
         icon: SizedBox(
           width: 24.0,
@@ -260,7 +262,7 @@ class __WidgetState extends State<_Widget> {
         suffixIcon: inputDecoration.suffixIcon ??
             ValueListenableBuilder<Country>(
               valueListenable: _countryNotifier,
-              builder: (_, country, __) => _buildFlag(theme, country),
+              builder: (context, country, __) => _buildFlag(context, theme, country),
             ),
       ),
     );
