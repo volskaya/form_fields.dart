@@ -13,18 +13,18 @@ import 'package:quiver/strings.dart';
 
 class CountryTextFormField extends FormField<Country> {
   CountryTextFormField({
-    Key key,
-    Country initialValue,
-    FormFieldSetter<Country> onSaved,
-    FormFieldValidator<Country> validator,
-    ValueChanged<Country> onChanged,
+    Key? key,
+    Country? initialValue,
+    FormFieldSetter<Country>? onSaved,
+    FormFieldValidator<Country>? validator,
+    ValueChanged<Country?>? onChanged,
     AutovalidateMode autovalidateMode = AutovalidateMode.disabled,
     bool enabled = true,
-    TextEditingController controller,
-    FocusNode focusNode,
-    InputDecoration decoration,
-    TextStyle style,
-    FormFieldAttachmentBuilder attachmentBuilder,
+    TextEditingController? controller,
+    FocusNode? focusNode,
+    InputDecoration? decoration,
+    TextStyle? style,
+    FormFieldAttachmentBuilder? attachmentBuilder,
   }) : super(
           key: key,
           onSaved: onSaved,
@@ -48,8 +48,8 @@ class CountryTextFormField extends FormField<Country> {
 
 class _Widget extends StatefulWidget {
   const _Widget({
-    @required this.state,
-    @required this.onChanged,
+    required this.state,
+    this.onChanged,
     this.controller,
     this.focusNode,
     this.decoration,
@@ -58,25 +58,26 @@ class _Widget extends StatefulWidget {
   });
 
   final FormFieldState<Country> state;
-  final ValueChanged<Country> onChanged;
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final InputDecoration decoration;
-  final TextStyle style;
-  final FormFieldAttachmentBuilder attachmentBuilder;
+  final ValueChanged<Country?>? onChanged;
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
+  final InputDecoration? decoration;
+  final TextStyle? style;
+  final FormFieldAttachmentBuilder? attachmentBuilder;
 
   @override
   __WidgetState createState() => __WidgetState();
 }
 
 class __WidgetState extends State<_Widget> with InitialDependencies {
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+
   bool _shouldDisposeController = false;
   bool _shouldDisposeFocusNode = false;
-  TextEditingController _controller;
-  FocusNode _focusNode;
 
-  void _updateCountry([Country country]) {
-    _controller.text = country?.name != null ? Country.localize(context, country) : '';
+  void _updateCountry([Country? country]) {
+    _controller.text = country?.name != null ? Country.localize(context, country!) : '';
     widget.onChanged?.call(country);
     widget.state.didChange(country);
   }
@@ -84,7 +85,7 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
   Future _pickCountry() async {
     final scrollController = ScrollController();
     final scrollToggle = ScrollControllerToggle(controller: scrollController);
-    final notifier = ValueNotifier<Country>(widget.state.value);
+    final notifier = ValueNotifier<Country?>(widget.state.value);
     final attachment = widget.attachmentBuilder?.call(context, 'country_text_form_field');
 
     final pickedCountry = await showModal<Country>(
@@ -97,7 +98,7 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
               child: Text(strings.cancelButtonLabel, layoutTwice: true),
               onPressed: () => Navigator.pop(context),
             ),
-            ValueListenableBuilder<Country>(
+            ValueListenableBuilder<Country?>(
               valueListenable: notifier,
               builder: (_, selectedValue, child) => TextButton(
                 child: Text(strings.okButtonLabel, layoutTwice: true),
@@ -132,7 +133,7 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
                       ),
                     );
 
-                    return ValueListenableBuilder<Country>(
+                    return ValueListenableBuilder<Country?>(
                       valueListenable: notifier,
                       builder: (_, selectedValue, ___) => RadioListTile<Country>(
                         contentPadding: const EdgeInsets.only(left: 12, right: 24),
@@ -161,7 +162,7 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
             child: ValueListenableBuilder<bool>(
               valueListenable: scrollToggle,
               builder: (context, overlapsContent, ___) => MaterialDialogContainer(
-                title: Text(FormFieldsLocalizations.of(context).countryDialogTitle),
+                title: Text(FormFieldsLocalizations.of(context)?.countryDialogTitle ?? 'Country'),
                 content: content,
                 overlapsContent: overlapsContent,
                 buttons: buttons,
@@ -172,7 +173,10 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
         });
 
     if (pickedCountry != null) _updateCountry(pickedCountry);
-    if (widget.state.value == null) WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode?.unfocus());
+    if (widget.state.value == null)
+      WidgetsBinding.instance!.addPostFrameCallback(
+        (_) => mounted ? _focusNode.unfocus() : null,
+      );
   }
 
   @override
@@ -182,26 +186,26 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
     _focusNode = widget.focusNode ?? FocusNode();
     _controller = widget.controller ??
         TextEditingController(
-          text: widget.state.value?.name != null ? Country.localize(context, widget.state.value) : '',
+          text: widget.state.value?.name != null ? Country.localize(context, widget.state.value!) : '',
         );
   }
 
   @override
   void dispose() {
-    if (_shouldDisposeController) _controller?.dispose();
-    if (_shouldDisposeFocusNode) _focusNode?.dispose();
+    if (_shouldDisposeController) _controller.dispose();
+    if (_shouldDisposeFocusNode) _focusNode.dispose();
     super.dispose();
   }
 
-  Widget _buildFlag(BuildContext context, ThemeData theme, [Country country]) => Padding(
+  Widget _buildFlag(BuildContext context, ThemeData theme, [Country? country]) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: SizedBox(
           height: 40,
           width: 32.0,
           child: Tooltip(
-            message: FormFieldsLocalizations.of(context).countryPickButtonTooltip,
+            message: FormFieldsLocalizations.of(context)?.countryPickButtonTooltip ?? 'Pick a country',
             child: SwitchingImage(
-              imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country, package: 'form_fields') : null,
+              imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country!, package: 'form_fields') : null,
               type: SwitchingImageType.scale,
               fit: BoxFit.contain,
               idleChild: Center(

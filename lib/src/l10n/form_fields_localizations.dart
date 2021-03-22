@@ -67,7 +67,7 @@ abstract class FormFieldsLocalizations {
   // ignore: unused_field
   final String localeName;
 
-  static FormFieldsLocalizations of(BuildContext context) {
+  static FormFieldsLocalizations? of(BuildContext context) {
     return Localizations.of<FormFieldsLocalizations>(context, FormFieldsLocalizations);
   }
 

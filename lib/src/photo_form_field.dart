@@ -11,26 +11,26 @@ import 'package:quiver/strings.dart';
 
 part 'photo_form_field.freezed.dart';
 
-typedef PhotoFormFieldIdleBuilder = Widget Function(BuildContext context, Widget child, String error);
+typedef PhotoFormFieldIdleBuilder = Widget Function(BuildContext context, Widget child, String? error);
 
 @freezed
-abstract class PhotoFormFieldValue with _$PhotoFormFieldValue {
-  const factory PhotoFormFieldValue.local({@required File file}) = _LocalFileValue;
-  const factory PhotoFormFieldValue.online({@required ImageProvider imageProvider}) = _OnlineFileValue;
+class PhotoFormFieldValue with _$PhotoFormFieldValue {
+  const factory PhotoFormFieldValue.local({required File file}) = _LocalFileValue;
+  const factory PhotoFormFieldValue.online({required ImageProvider imageProvider}) = _OnlineFileValue;
 }
 
-class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue>> {
+class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue?>> {
   PhotoFormField({
     bool interactive = true,
     bool singlePhoto = false,
-    EdgeInsets secondaryPhotoPadding,
-    FormFieldSetter<Map<int, PhotoFormFieldValue>> onSaved,
-    FormFieldValidator<Map<int, PhotoFormFieldValue>> validator,
-    Map<int, PhotoFormFieldValue> initialValue = const <int, PhotoFormFieldValue>{},
+    EdgeInsets secondaryPhotoPadding = EdgeInsets.zero,
+    FormFieldSetter<Map<int, PhotoFormFieldValue?>>? onSaved,
+    FormFieldValidator<Map<int, PhotoFormFieldValue?>>? validator,
+    Map<int, PhotoFormFieldValue?> initialValue = const <int, PhotoFormFieldValue?>{},
     AutovalidateMode autovalidateMode = AutovalidateMode.disabled,
     bool enabled = true,
-    PhotoFormFieldIdleBuilder idleBuilder,
-    BorderRadius borderRadius,
+    PhotoFormFieldIdleBuilder? idleBuilder,
+    BorderRadius? borderRadius,
     Duration switchDuration = const Duration(milliseconds: 250),
   }) : super(
           onSaved: onSaved,
@@ -52,19 +52,19 @@ class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue>> {
   static IconData photoIcon = Icons.image;
   static int maxSecondaryPhotos = 4;
 
-  static Future<File> pickImage({bool useCamera = false}) async {
+  static Future<File?> pickImage({bool useCamera = false}) async {
     final picker = ImagePicker();
-    File file;
+    File? file;
 
     try {
       final pickedFile = await picker.getImage(
         source: useCamera ? ImageSource.camera : ImageSource.gallery,
       );
 
-      file = File(pickedFile.path);
+      file = pickedFile != null ? File(pickedFile.path) : null;
     } catch (e) {
       final response = await picker.getLostData();
-      file = response?.type == RetrieveType.image ? File(response.file.path) : null;
+      file = response.type == RetrieveType.image ? File(response.file!.path) : null;
     }
 
     return file;
@@ -73,22 +73,22 @@ class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue>> {
 
 class _Widget extends StatelessWidget {
   const _Widget({
-    Key key,
-    @required this.state,
-    @required this.interactive,
-    @required this.singlePhoto,
+    Key? key,
+    required this.state,
+    required this.interactive,
+    required this.singlePhoto,
     this.secondaryPhotoPadding = EdgeInsets.zero,
     this.idleBuilder,
     this.borderRadius,
     this.switchDuration = const Duration(milliseconds: 250),
   }) : super(key: key);
 
-  final FormFieldState<Map<int, PhotoFormFieldValue>> state;
+  final FormFieldState<Map<int, PhotoFormFieldValue?>> state;
   final EdgeInsets secondaryPhotoPadding;
   final bool interactive;
   final bool singlePhoto;
-  final PhotoFormFieldIdleBuilder idleBuilder;
-  final BorderRadius borderRadius;
+  final PhotoFormFieldIdleBuilder? idleBuilder;
+  final BorderRadius? borderRadius;
   final Duration switchDuration;
 
   static final _log = Log.named('PhotoFormField');
@@ -99,11 +99,11 @@ class _Widget extends StatelessWidget {
     if (photo == null && !remove) {
       return _log.w('Picker returned no image, skipping…');
     } else if (id == 0 && photo == null) {
-      // Main photo deleted
+      // Main photo deleted.
       state.didChange(const <int, PhotoFormFieldValue>{});
     } else {
-      // Only handle the index photo
-      state.didChange(Map<int, PhotoFormFieldValue>.from(state.value)
+      // Only handle the index photo.
+      state.didChange(Map<int, PhotoFormFieldValue?>.from(state.value ?? const <int, PhotoFormFieldValue?>{})
         ..[id] = photo != null ? PhotoFormFieldValue.local(file: photo) : null);
     }
   }
@@ -132,7 +132,7 @@ class _Widget extends StatelessWidget {
 
     final image = LayoutBuilder(
       builder: (_, c) {
-        final imageProvider = state.value[index]?.map(
+        final imageProvider = state.value?[index]?.map(
           local: (value) => FileImage(value.file),
           online: (value) => value.imageProvider,
         );
@@ -154,9 +154,10 @@ class _Widget extends StatelessWidget {
         ? OverlayedInkWell(
             borderRadius: borderRadius,
             child: image,
-            onTap:
-                state.widget.enabled && index == 0 || state.value.containsKey(0) ? () => _handleTap(id: index) : null,
-            onLongPress: state.widget.enabled && state.value.containsKey(index)
+            onTap: state.widget.enabled && index == 0 || state.value?.containsKey(0) == true
+                ? () => _handleTap(id: index)
+                : null,
+            onLongPress: state.widget.enabled && state.value?.containsKey(index) == true
                 ? () => _handleTap(id: index, remove: true)
                 : null,
           )
@@ -181,8 +182,8 @@ class _Widget extends StatelessWidget {
                   ? Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                       child: Text(
-                        state.errorText,
-                        style: theme.textTheme.caption.apply(color: theme.colorScheme.error),
+                        state.errorText!,
+                        style: theme.textTheme.caption!.apply(color: theme.colorScheme.error),
                       ),
                     )
                   : null,
@@ -203,14 +204,14 @@ class _Widget extends StatelessWidget {
 
               // Secondary photos.
               Padding(
-                padding: secondaryPhotoPadding ?? EdgeInsets.zero,
+                padding: secondaryPhotoPadding,
                 child: AnimatedCrossFade(
                   duration: switchDuration,
                   alignment: Alignment.topCenter,
                   sizeCurve: standardEasing,
                   firstCurve: standardEasing,
                   secondCurve: standardEasing,
-                  crossFadeState: state.value.containsKey(0) && (interactive || state.value.length >= 2)
+                  crossFadeState: state.value?.containsKey(0) == true && (interactive || state.value!.length >= 2)
                       ? CrossFadeState.showSecond
                       : CrossFadeState.showFirst,
                   firstChild: const SizedBox(width: double.infinity),

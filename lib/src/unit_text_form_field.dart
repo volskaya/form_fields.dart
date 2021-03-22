@@ -8,26 +8,26 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class UnitTextFormField<T> extends FormField<T> {
   UnitTextFormField({
-    @required List<T> items,
-    @required Widget Function(BuildContext context, T value) itemBuilder,
-    @required String Function(T value) getText,
-    @required Widget title,
-    bool Function(T value) getValueState,
+    required List<T> items,
+    required Widget Function(BuildContext context, T value) itemBuilder,
+    required String Function(T value) getText,
+    required Widget title,
+    bool Function(T? value)? getValueState,
     bool shrinkWrap = false,
     bool toggleable = false,
-    Key key,
-    T defaultValue,
-    T initialValue,
-    FormFieldSetter<T> onSaved,
-    FormFieldValidator<T> validator,
-    ValueChanged<T> onChanged,
+    Key? key,
+    T? defaultValue,
+    T? initialValue,
+    FormFieldSetter<T>? onSaved,
+    FormFieldValidator<T>? validator,
+    ValueChanged<T?>? onChanged,
     AutovalidateMode autovalidateMode = AutovalidateMode.disabled,
     bool enabled = true,
-    TextEditingController controller,
-    FocusNode focusNode,
-    InputDecoration decoration,
-    TextStyle style,
-    FormFieldAttachmentBuilder attachmentBuilder,
+    TextEditingController? controller,
+    FocusNode? focusNode,
+    InputDecoration? decoration,
+    TextStyle? style,
+    FormFieldAttachmentBuilder? attachmentBuilder,
   }) : super(
           key: key,
           onSaved: onSaved,
@@ -57,12 +57,12 @@ class UnitTextFormField<T> extends FormField<T> {
 
 class _Widget<T> extends StatefulWidget {
   const _Widget({
-    @required this.state,
-    @required this.onChanged,
-    @required this.items,
-    @required this.itemBuilder,
-    @required this.getText,
-    @required this.title,
+    required this.state,
+    required this.items,
+    required this.itemBuilder,
+    required this.getText,
+    required this.title,
+    this.onChanged,
     this.getValueState,
     this.defaultValue,
     this.controller,
@@ -75,32 +75,33 @@ class _Widget<T> extends StatefulWidget {
   });
 
   final FormFieldState<T> state;
-  final ValueChanged<T> onChanged;
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final InputDecoration decoration;
-  final TextStyle style;
+  final ValueChanged<T?>? onChanged;
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
+  final InputDecoration? decoration;
+  final TextStyle? style;
   final List<T> items;
   final Widget Function(BuildContext context, T value) itemBuilder;
   final String Function(T value) getText;
   final Widget title;
   final bool shrinkWrap;
   final bool toggleable;
-  final T defaultValue;
-  final bool Function(T value) getValueState;
-  final FormFieldAttachmentBuilder attachmentBuilder;
+  final T? defaultValue;
+  final bool Function(T? value)? getValueState;
+  final FormFieldAttachmentBuilder? attachmentBuilder;
 
   @override
   __WidgetState<T> createState() => __WidgetState<T>();
 }
 
 class __WidgetState<T> extends State<_Widget<T>> {
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+
   bool _shouldDisposeController = false;
   bool _shouldDisposeFocusNode = false;
-  TextEditingController _controller;
-  FocusNode _focusNode;
 
-  void _updateValue([T value]) {
+  void _updateValue([T? value]) {
     final _value = value ?? widget.defaultValue;
     _controller.text = _value != null ? widget.getText(_value) : '';
     widget.onChanged?.call(_value);
@@ -110,9 +111,9 @@ class __WidgetState<T> extends State<_Widget<T>> {
   Future _pickUnit() async {
     final scrollController = ScrollController();
     final scrollToggle = ScrollControllerToggle(controller: scrollController);
-    final notifier = ValueNotifier<T>(widget.state.value);
+    final notifier = ValueNotifier<T?>(widget.state.value);
     final key = widget.title is Text ? (widget.title as Text).data : T.toString();
-    final attachment = widget.attachmentBuilder(context, 'unit_text_form_field_ad_$key');
+    final attachment = widget.attachmentBuilder?.call(context, 'unit_text_form_field_ad_$key');
 
     final value = await showModal<T>(
       context: context,
@@ -124,7 +125,7 @@ class __WidgetState<T> extends State<_Widget<T>> {
             child: Text(strings.cancelButtonLabel, layoutTwice: true),
             onPressed: () => Navigator.pop(context),
           ),
-          ValueListenableBuilder<T>(
+          ValueListenableBuilder<T?>(
             valueListenable: notifier,
             builder: (_, selectedValue, child) => TextButton(
               child: Text(strings.okButtonLabel, layoutTwice: true),
@@ -146,7 +147,7 @@ class __WidgetState<T> extends State<_Widget<T>> {
               delegate: SliverChildBuilderDelegate(
                 (context, i) {
                   final item = widget.items[i];
-                  return ValueListenableBuilder<T>(
+                  return ValueListenableBuilder<T?>(
                     valueListenable: notifier,
                     builder: (_, selectedValue, child) => RadioListTile<T>(
                       contentPadding: const EdgeInsets.only(left: 12, right: 24),
@@ -188,7 +189,8 @@ class __WidgetState<T> extends State<_Widget<T>> {
     );
 
     if (value != null) _updateValue(value);
-    if (widget.state.value == null) WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode?.unfocus());
+    if (widget.state.value == null)
+      WidgetsBinding.instance!.addPostFrameCallback((_) => mounted ? _focusNode.unfocus() : null);
   }
 
   @override
@@ -198,13 +200,13 @@ class __WidgetState<T> extends State<_Widget<T>> {
     _shouldDisposeFocusNode = widget.focusNode == null;
     _focusNode = widget.focusNode ?? FocusNode();
     _controller = widget.controller ??
-        TextEditingController(text: widget.state.value != null ? widget.getText(widget.state.value) : '');
+        TextEditingController(text: widget.state.value != null ? widget.getText(widget.state.value!) : '');
   }
 
   @override
   void dispose() {
-    if (_shouldDisposeController) _controller?.dispose();
-    if (_shouldDisposeFocusNode) _focusNode?.dispose();
+    if (_shouldDisposeController) _controller.dispose();
+    if (_shouldDisposeFocusNode) _focusNode.dispose();
     super.dispose();
   }
 

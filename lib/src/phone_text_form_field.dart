@@ -15,20 +15,20 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class PhoneTextFormField extends FormField<String> {
   PhoneTextFormField({
-    Key key,
-    String initialValue,
-    FormFieldSetter<String> onSaved,
-    FormFieldValidator<String> validator,
-    ValueChanged<String> onChanged,
-    ValueChanged<String> onFieldSubmitted,
+    Key? key,
+    String? initialValue,
+    FormFieldSetter<String>? onSaved,
+    FormFieldValidator<String>? validator,
+    ValueChanged<String?>? onChanged,
+    ValueChanged<String?>? onFieldSubmitted,
     AutovalidateMode autovalidateMode = AutovalidateMode.disabled,
     bool enabled = true,
     bool readOnly = false,
-    TextEditingController controller,
-    FocusNode focusNode,
-    InputDecoration decoration,
-    TextStyle style,
-    FormFieldAttachmentBuilder attachmentBuilder,
+    TextEditingController? controller,
+    FocusNode? focusNode,
+    InputDecoration? decoration,
+    TextStyle? style,
+    FormFieldAttachmentBuilder? attachmentBuilder,
   }) : super(
           key: key,
           onSaved: onSaved,
@@ -54,8 +54,8 @@ class PhoneTextFormField extends FormField<String> {
 
 class _Widget extends StatefulWidget {
   const _Widget({
-    @required this.state,
-    @required this.onChanged,
+    required this.state,
+    this.onChanged,
     this.onFieldSubmitted,
     this.controller,
     this.focusNode,
@@ -66,26 +66,27 @@ class _Widget extends StatefulWidget {
   });
 
   final FormFieldState<String> state;
-  final ValueChanged<String> onChanged;
-  final ValueChanged<String> onFieldSubmitted;
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final InputDecoration decoration;
-  final TextStyle style;
+  final ValueChanged<String?>? onChanged;
+  final ValueChanged<String>? onFieldSubmitted;
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
+  final InputDecoration? decoration;
+  final TextStyle? style;
   final bool readOnly;
-  final FormFieldAttachmentBuilder attachmentBuilder;
+  final FormFieldAttachmentBuilder? attachmentBuilder;
 
   @override
   __WidgetState createState() => __WidgetState();
 }
 
 class __WidgetState extends State<_Widget> {
-  final _countryNotifier = ValueNotifier<Country>(null);
+  final _countryNotifier = ValueNotifier<Country?>(null);
+
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
 
   bool _shouldDisposeController = false;
   bool _shouldDisposeFocusNode = false;
-  TextEditingController _controller;
-  FocusNode _focusNode;
 
   void _updateCountry(Country country) {
     if (_countryNotifier.value == country) return;
@@ -124,7 +125,7 @@ class __WidgetState extends State<_Widget> {
   Future _pickCountry() async {
     final scrollController = ScrollController();
     final scrollToggle = ScrollControllerToggle(controller: scrollController);
-    final notifier = ValueNotifier<Country>(_countryNotifier.value);
+    final notifier = ValueNotifier<Country?>(_countryNotifier.value);
     final attachment = widget.attachmentBuilder?.call(context, 'phone_text_form_field');
 
     final pickedCountry = await showModal<Country>(
@@ -163,7 +164,7 @@ class __WidgetState extends State<_Widget> {
                       ),
                     );
 
-                    return ValueListenableBuilder<Country>(
+                    return ValueListenableBuilder<Country?>(
                       valueListenable: notifier,
                       builder: (_, selectedValue, ___) => ListTile(
                         contentPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -190,7 +191,7 @@ class __WidgetState extends State<_Widget> {
             child: ValueListenableBuilder<bool>(
               valueListenable: scrollToggle,
               builder: (context, overlapsContent, ___) => MaterialDialogContainer(
-                title: Text(FormFieldsLocalizations.of(context).phoneCountryDialogTitle),
+                title: Text(FormFieldsLocalizations.of(context)?.phoneCountryDialogTitle ?? 'Country code'),
                 content: content,
                 overlapsContent: overlapsContent,
                 attachment: attachment,
@@ -200,7 +201,10 @@ class __WidgetState extends State<_Widget> {
         });
 
     if (pickedCountry != null) _updateCountry(pickedCountry);
-    if (widget.state.value == null) WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode?.unfocus());
+    if (widget.state.value == null)
+      WidgetsBinding.instance!.addPostFrameCallback(
+        (_) => mounted ? _focusNode.unfocus() : null,
+      );
   }
 
   @override
@@ -219,19 +223,19 @@ class __WidgetState extends State<_Widget> {
   void dispose() {
     super.dispose();
     _countryNotifier.dispose();
-    _controller?.removeListener(_handleChange);
-    if (_shouldDisposeController) _controller?.dispose();
-    if (_shouldDisposeFocusNode) _focusNode?.dispose();
+    _controller.removeListener(_handleChange);
+    if (_shouldDisposeController) _controller.dispose();
+    if (_shouldDisposeFocusNode) _focusNode.dispose();
   }
 
-  Widget _buildFlag(BuildContext context, ThemeData theme, [Country country]) => IconButton(
-        tooltip: FormFieldsLocalizations.of(context).phoneCountryCodeButtonTooltip,
+  Widget _buildFlag(BuildContext context, ThemeData theme, [Country? country]) => IconButton(
+        tooltip: FormFieldsLocalizations.of(context)?.phoneCountryCodeButtonTooltip ?? 'Pick a country code',
         onPressed: !widget.readOnly ? _pickCountry : null,
         icon: SizedBox(
           width: 24.0,
           height: 32.0,
           child: SwitchingImage(
-            imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country, package: 'form_fields') : null,
+            imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country!, package: 'form_fields') : null,
             type: SwitchingImageType.scale,
             fit: BoxFit.contain,
             idleChild: Center(
@@ -260,7 +264,7 @@ class __WidgetState extends State<_Widget> {
         errorText: widget.state.hasError ? widget.state.errorText : null,
         counterText: '',
         suffixIcon: inputDecoration.suffixIcon ??
-            ValueListenableBuilder<Country>(
+            ValueListenableBuilder<Country?>(
               valueListenable: _countryNotifier,
               builder: (context, country, __) => _buildFlag(context, theme, country),
             ),

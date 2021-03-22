@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class OverlayedInkWell extends StatelessWidget {
   const OverlayedInkWell({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.onTap,
     this.onLongPress,
     this.onTapCancel,
@@ -12,10 +12,10 @@ class OverlayedInkWell extends StatelessWidget {
   }) : super(key: key);
 
   final Widget child;
-  final VoidCallback onTap;
-  final VoidCallback onLongPress;
-  final VoidCallback onTapCancel;
-  final BorderRadius borderRadius;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onTapCancel;
+  final BorderRadius? borderRadius;
   final StackFit fit;
 
   @override

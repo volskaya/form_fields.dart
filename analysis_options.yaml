@@ -19,6 +19,9 @@
 # Android Studio, and the `flutter analyze` command.
 
 analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
   strong-mode:
     implicit-casts: false
     implicit-dynamic: false

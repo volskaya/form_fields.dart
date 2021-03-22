@@ -10,19 +10,19 @@ typedef TimeToStringCallback = String Function(TimeOfDay val);
 
 class TimerTextFormField extends FormField<TimeOfDay> {
   TimerTextFormField({
-    Key key,
-    @required TimeToStringCallback getText,
-    TimeOfDay initialValue,
-    FormFieldSetter<TimeOfDay> onSaved,
-    FormFieldValidator<TimeOfDay> validator,
-    ValueChanged<TimeOfDay> onChanged,
+    Key? key,
+    required TimeToStringCallback getText,
+    TimeOfDay? initialValue,
+    FormFieldSetter<TimeOfDay>? onSaved,
+    FormFieldValidator<TimeOfDay>? validator,
+    ValueChanged<TimeOfDay?>? onChanged,
     AutovalidateMode autovalidateMode = AutovalidateMode.disabled,
     bool enabled = true,
-    TextEditingController controller,
-    FocusNode focusNode,
-    InputDecoration decoration,
-    TextStyle style,
-    FormFieldAttachmentBuilder attachmentBuilder,
+    TextEditingController? controller,
+    FocusNode? focusNode,
+    InputDecoration? decoration,
+    TextStyle? style,
+    FormFieldAttachmentBuilder? attachmentBuilder,
   }) : super(
           key: key,
           onSaved: onSaved,
@@ -48,9 +48,9 @@ class TimerTextFormField extends FormField<TimeOfDay> {
 
 class _Widget extends StatefulWidget {
   const _Widget({
-    @required this.state,
-    @required this.onChanged,
-    @required this.getText,
+    required this.state,
+    required this.getText,
+    this.onChanged,
     this.controller,
     this.focusNode,
     this.decoration,
@@ -59,25 +59,26 @@ class _Widget extends StatefulWidget {
   });
 
   final FormFieldState<TimeOfDay> state;
-  final ValueChanged<TimeOfDay> onChanged;
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final InputDecoration decoration;
-  final TextStyle style;
   final TimeToStringCallback getText;
-  final FormFieldAttachmentBuilder attachmentBuilder;
+  final ValueChanged<TimeOfDay?>? onChanged;
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
+  final InputDecoration? decoration;
+  final TextStyle? style;
+  final FormFieldAttachmentBuilder? attachmentBuilder;
 
   @override
   __WidgetState createState() => __WidgetState();
 }
 
 class __WidgetState extends State<_Widget> {
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+
   bool _shouldDisposeController = false;
   bool _shouldDisposeFocusNode = false;
-  TextEditingController _controller;
-  FocusNode _focusNode;
 
-  void _updateValue([TimeOfDay value]) {
+  void _updateValue([TimeOfDay? value]) {
     _controller.text = value != null ? widget.getText(value) : '';
     widget.onChanged?.call(value);
     widget.state.didChange(value);
@@ -90,7 +91,6 @@ class __WidgetState extends State<_Widget> {
       case TimePickerEntryMode.input:
         return TimerTextFormField.dialIcon;
     }
-    throw UnimplementedError();
   }
 
   Future _pickUnit() async {
@@ -118,7 +118,8 @@ class __WidgetState extends State<_Widget> {
     );
 
     if (value != null) _updateValue(value);
-    if (widget.state.value == null) WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode?.unfocus());
+    if (widget.state.value == null)
+      WidgetsBinding.instance!.addPostFrameCallback((_) => mounted ? _focusNode.unfocus() : null);
   }
 
   @override
@@ -127,14 +128,14 @@ class __WidgetState extends State<_Widget> {
     _shouldDisposeFocusNode = widget.focusNode == null;
     _focusNode = widget.focusNode ?? FocusNode();
     _controller = widget.controller ??
-        TextEditingController(text: widget.state.value != null ? widget.getText(widget.state.value) : '');
+        TextEditingController(text: widget.state.value != null ? widget.getText(widget.state.value!) : '');
     super.initState();
   }
 
   @override
   void dispose() {
-    if (_shouldDisposeController) _controller?.dispose();
-    if (_shouldDisposeFocusNode) _focusNode?.dispose();
+    if (_shouldDisposeController) _controller.dispose();
+    if (_shouldDisposeFocusNode) _focusNode.dispose();
     super.dispose();
   }
 

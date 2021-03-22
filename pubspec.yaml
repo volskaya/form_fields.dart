@@ -1,11 +1,11 @@
 name: form_fields
-version: 1.0.0
+version: 1.1.0
 author: Roland Volskaya
 homepage: github.com/volskaya/form_fields.dart
 publish_to: none
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
   flutter: ">=1.17.0 <2.0.0"
 
 dependencies:
@@ -14,9 +14,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  json_annotation:
-  image_picker: ^0.6.7+4
-  freezed: ^0.12.6
+  json_annotation: ^4.0.1
+  image_picker: ^0.7.3
+  freezed_annotation: ^0.14.1
 
   firebase_image:
     path: /home/projects/packages/firebase_image
@@ -30,19 +30,11 @@ dependencies:
     path: /home/projects/packages/country_catalog
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
-  json_serializable:
-  build_runner: ^1.10.0
-  freezed_annotation: ^0.12.0
+  build_runner:
+  json_serializable: ^4.1.0
+  freezed: ^0.14.1+1
 
 dependency_overrides:
-  intl: 0.17.0
-  freezed_annotation:
-    path: /home/projects/forks/freezed/packages/freezed_annotation
-  freezed:
-    path: /home/projects/forks/freezed/packages/freezed
   mobx_codegen:
     path: /home/projects/forks/mobx.dart/mobx_codegen
 
