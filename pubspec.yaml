@@ -35,6 +35,10 @@ dev_dependencies:
   freezed: ^0.14.1+1
 
 dependency_overrides:
+  freezed_annotation:
+    path: /home/projects/forks/freezed/packages/freezed_annotation
+  freezed:
+    path: /home/projects/forks/freezed/packages/freezed
   mobx_codegen:
     path: /home/projects/forks/mobx.dart/mobx_codegen
 

@@ -35,7 +35,7 @@ packages:
       name: args
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.6.0"
+    version: "2.0.0"
   async:
     dependency: transitive
     description:
@@ -383,16 +383,16 @@ packages:
   freezed:
     dependency: "direct dev"
     description:
-      name: freezed
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "/home/projects/forks/freezed/packages/freezed"
+      relative: false
+    source: path
     version: "0.14.1+1"
   freezed_annotation:
     dependency: "direct main"
     description:
-      name: freezed_annotation
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "/home/projects/forks/freezed/packages/freezed_annotation"
+      relative: false
+    source: path
     version: "0.14.1"
   glob:
     dependency: transitive
@@ -421,7 +421,7 @@ packages:
       name: http_multi_server
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.0"
+    version: "3.0.0"
   http_parser:
     dependency: transitive
     description:
@@ -470,7 +470,7 @@ packages:
       name: io
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.4"
+    version: "1.0.0"
   js:
     dependency: transitive
     description:
@@ -512,7 +512,7 @@ packages:
       name: logger
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0-nullsafety.0"
+    version: "1.0.0"
   logging:
     dependency: transitive
     description:
@@ -547,7 +547,7 @@ packages:
       name: mime
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.9.7"
+    version: "1.0.0"
   mobx:
     dependency: transitive
     description:
@@ -659,7 +659,7 @@ packages:
       name: process
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.1.0"
+    version: "4.1.1"
   provider:
     dependency: transitive
     description:
@@ -755,7 +755,7 @@ packages:
       name: source_span
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.8.0"
+    version: "1.8.1"
   sqflite:
     dependency: transitive
     description:
