@@ -6,7 +6,7 @@ import 'package:form_fields/src/typedefs.dart';
 import 'package:material_dialog/material_dialog.dart';
 import 'package:refresh_storage/refresh_storage.dart';
 
-typedef TimeToStringCallback = String Function(TimeOfDay val);
+typedef TimeToStringCallback = String Function(TimeOfDay? val);
 
 class TimerTextFormField extends FormField<TimeOfDay> {
   TimerTextFormField({
@@ -104,11 +104,11 @@ class __WidgetState extends State<_Widget> {
         context: context,
         builder: (context) => Padding(
           padding: const EdgeInsets.all(16.0) + MediaQuery.of(context).padding,
-          child: attachment != null
+          child: attachment?.widget != null
               ? RefreshStorage.wrapProvider(
-                  state: attachment.storage,
+                  state: attachment!.storage,
                   child: MaterialDialogAttachmentContainer(
-                    attachment: attachment.widget,
+                    attachment: attachment.widget!,
                     child: builder(context),
                   ),
                 )

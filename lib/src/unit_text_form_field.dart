@@ -10,7 +10,7 @@ class UnitTextFormField<T> extends FormField<T> {
   UnitTextFormField({
     required List<T> items,
     required Widget Function(BuildContext context, T value) itemBuilder,
-    required String Function(T value) getText,
+    required String Function(T? value) getText,
     required Widget title,
     bool Function(T? value)? getValueState,
     bool shrinkWrap = false,
@@ -82,7 +82,7 @@ class _Widget<T> extends StatefulWidget {
   final TextStyle? style;
   final List<T> items;
   final Widget Function(BuildContext context, T value) itemBuilder;
-  final String Function(T value) getText;
+  final String Function(T? value) getText;
   final Widget title;
   final bool shrinkWrap;
   final bool toggleable;

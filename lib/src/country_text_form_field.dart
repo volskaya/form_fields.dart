@@ -123,7 +123,7 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
                         builder: (_, context) => SwitchingImage(
                           imageProvider: ScrollAwareImageProvider(
                             context: context,
-                            imageProvider: Country.imageOf(country, package: 'form_fields'),
+                            imageProvider: Country.imageOf(country),
                           ),
                           type: SwitchingImageType.fade,
                           fit: BoxFit.contain,
