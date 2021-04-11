@@ -6,22 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:material_dialog/material_dialog.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class UnitTextFormField<T> extends FormField<T> {
-  UnitTextFormField({
+class MultiUnitTextFormField<T> extends FormField<Set<T>> {
+  MultiUnitTextFormField({
     required List<T> items,
     required Widget Function(BuildContext context, T value) itemBuilder,
-    required String Function(T? value) getText,
+    required String Function(Set<T> value) getText,
     required Widget title,
     Widget? Function(BuildContext, T value)? secondaryBuilder,
     bool Function(T? value)? getValueState,
     bool shrinkWrap = false,
-    bool toggleable = false,
+    bool toggleable = true,
     Key? key,
-    T? defaultValue,
-    T? initialValue,
-    FormFieldSetter<T>? onSaved,
-    FormFieldValidator<T>? validator,
-    ValueChanged<T?>? onChanged,
+    Set<T>? defaultValue,
+    Set<T>? initialValue,
+    FormFieldSetter<Set<T>>? onSaved,
+    FormFieldValidator<Set<T>>? validator,
+    ValueChanged<Set<T>?>? onChanged,
     AutovalidateMode autovalidateMode = AutovalidateMode.disabled,
     bool enabled = true,
     TextEditingController? controller,
@@ -72,13 +72,13 @@ class _Widget<T> extends StatefulWidget {
     this.focusNode,
     this.decoration,
     this.style,
-    this.toggleable = false,
+    this.toggleable = true,
     this.shrinkWrap = false,
     this.attachmentBuilder,
   });
 
-  final FormFieldState<T> state;
-  final ValueChanged<T?>? onChanged;
+  final FormFieldState<Set<T>> state;
+  final ValueChanged<Set<T>?>? onChanged;
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final InputDecoration? decoration;
@@ -86,11 +86,11 @@ class _Widget<T> extends StatefulWidget {
   final List<T> items;
   final Widget Function(BuildContext context, T value) itemBuilder;
   final Widget? Function(BuildContext, T value)? secondaryBuilder;
-  final String Function(T? value) getText;
+  final String Function(Set<T> value) getText;
   final Widget title;
   final bool shrinkWrap;
   final bool toggleable;
-  final T? defaultValue;
+  final Set<T>? defaultValue;
   final bool Function(T? value)? getValueState;
   final FormFieldAttachmentBuilder? attachmentBuilder;
 
@@ -104,9 +104,9 @@ class __WidgetState<T> extends State<_Widget<T>> {
   bool _shouldDisposeController = false;
   bool _shouldDisposeFocusNode = false;
 
-  void _updateValue([T? value]) {
-    final _value = value ?? widget.defaultValue;
-    _controller.text = _value != null ? widget.getText(_value) : '';
+  void _updateValue([Set<T>? value]) {
+    final _value = value ?? widget.defaultValue ?? <T>{};
+    _controller.text = widget.getText(_value);
     widget.onChanged?.call(_value);
     widget.state.didChange(_value);
   }
@@ -114,11 +114,11 @@ class __WidgetState<T> extends State<_Widget<T>> {
   Future _pickUnit() async {
     final scrollController = ScrollController();
     final scrollToggle = ScrollControllerToggle(controller: scrollController);
-    final notifier = ValueNotifier<T?>(widget.state.value);
+    final notifier = ValueNotifier<Set<T>?>(widget.state.value?.isNotEmpty == true ? widget.state.value : null);
     final key = widget.title is Text ? (widget.title as Text).data : T.toString();
     final attachment = widget.attachmentBuilder?.call(context, 'unit_text_form_field_ad_$key');
 
-    final value = await showModal<T>(
+    final value = await showModal<Set<T>?>(
       context: context,
       builder: (context) {
         final theme = Theme.of(context);
@@ -128,14 +128,11 @@ class __WidgetState<T> extends State<_Widget<T>> {
             child: Text(strings.cancelButtonLabel, layoutTwice: true),
             onPressed: () => Navigator.pop(context),
           ),
-          ValueListenableBuilder<T?>(
+          ValueListenableBuilder<Set<T>?>(
             valueListenable: notifier,
             builder: (_, selectedValue, child) => TextButton(
               child: Text(strings.okButtonLabel, layoutTwice: true),
-              onPressed:
-                  (widget.toggleable || selectedValue != null) && (widget.getValueState?.call(selectedValue) ?? true)
-                      ? () => Navigator.pop(context, notifier.value)
-                      : null,
+              onPressed: selectedValue != null ? () => Navigator.pop(context, notifier.value) : null,
             ),
           ),
         ];
@@ -153,17 +150,21 @@ class __WidgetState<T> extends State<_Widget<T>> {
                   final child = widget.itemBuilder(context, item);
                   final secondary = widget.secondaryBuilder?.call(context, item);
 
-                  return ValueListenableBuilder<T?>(
+                  return ValueListenableBuilder<Set<T>?>(
                     valueListenable: notifier,
                     builder: (_, selectedValue, ___) => RadioListTile<T>(
                       contentPadding: const EdgeInsets.only(left: 12, right: 24),
                       value: item,
                       toggleable: widget.toggleable,
-                      groupValue: selectedValue,
+                      groupValue: selectedValue?.contains(item) == true ? item : null,
                       title: child,
                       secondary: secondary,
                       activeColor: theme.colorScheme.primary,
-                      onChanged: (widget.getValueState?.call(item) ?? true) ? (val) => notifier.value = val : null,
+                      onChanged: (widget.getValueState?.call(item) ?? true)
+                          ? (val) => notifier.value = val != null
+                              ? <T>{...notifier.value ?? <T>{}, item}
+                              : (<T>{...notifier.value ?? <T>{}}..remove(item))
+                          : null,
                     ),
                   );
                 },
@@ -194,8 +195,8 @@ class __WidgetState<T> extends State<_Widget<T>> {
       },
     );
 
-    if (value != null) _updateValue(value);
-    if (widget.state.value == null)
+    _updateValue(value);
+    if ((widget.state.value?.isEmpty ?? true) == true)
       WidgetsBinding.instance!.addPostFrameCallback((_) => mounted ? _focusNode.unfocus() : null);
   }
 

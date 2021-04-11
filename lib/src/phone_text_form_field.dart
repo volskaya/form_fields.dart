@@ -75,8 +75,7 @@ class _Widget extends StatefulWidget {
   final bool readOnly;
   final FormFieldAttachmentBuilder? attachmentBuilder;
 
-  @override
-  __WidgetState createState() => __WidgetState();
+  @override __WidgetState createState() => __WidgetState();
 }
 
 class __WidgetState extends State<_Widget> {
@@ -156,9 +155,11 @@ class __WidgetState extends State<_Widget> {
                             context: context,
                             imageProvider: Country.imageOf(country),
                           ),
+                          idleChild: Center(
+                            child: Icon(PhoneTextFormField.flagIcon, size: 12),
+                          ),
                           type: SwitchingImageType.fade,
                           fit: BoxFit.contain,
-                          idleChild: Icon(PhoneTextFormField.flagIcon, size: 12),
                           addRepaintBoundary: false,
                         ),
                       ),
@@ -207,8 +208,7 @@ class __WidgetState extends State<_Widget> {
       );
   }
 
-  @override
-  void initState() {
+  @override void initState() {
     super.initState();
 
     _shouldDisposeController = widget.controller == null;
@@ -219,8 +219,7 @@ class __WidgetState extends State<_Widget> {
     _deriveCountryFromText();
   }
 
-  @override
-  void dispose() {
+  @override void dispose() {
     super.dispose();
     _countryNotifier.dispose();
     _controller.removeListener(_handleChange);
@@ -235,7 +234,7 @@ class __WidgetState extends State<_Widget> {
           width: 24.0,
           height: 32.0,
           child: SwitchingImage(
-            imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country!, package: 'form_fields') : null,
+            imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country!) : null,
             type: SwitchingImageType.scale,
             fit: BoxFit.contain,
             idleChild: Center(
@@ -245,8 +244,7 @@ class __WidgetState extends State<_Widget> {
         ),
       );
 
-  @override
-  Widget build(BuildContext context) {
+  @override Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final inputDecoration = widget.decoration ?? const InputDecoration(hintText: '', counterText: '');
 

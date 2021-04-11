@@ -65,8 +65,7 @@ class _Widget extends StatefulWidget {
   final TextStyle? style;
   final FormFieldAttachmentBuilder? attachmentBuilder;
 
-  @override
-  __WidgetState createState() => __WidgetState();
+  @override __WidgetState createState() => __WidgetState();
 }
 
 class __WidgetState extends State<_Widget> with InitialDependencies {
@@ -125,9 +124,11 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
                             context: context,
                             imageProvider: Country.imageOf(country),
                           ),
+                          idleChild: Center(
+                            child: Icon(CountryTextFormField.flagIcon, size: 12),
+                          ),
                           type: SwitchingImageType.fade,
                           fit: BoxFit.contain,
-                          idleChild: Icon(CountryTextFormField.flagIcon, size: 12),
                           addRepaintBoundary: false,
                         ),
                       ),
@@ -179,8 +180,7 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
       );
   }
 
-  @override
-  void initDependencies() {
+  @override void initDependencies() {
     _shouldDisposeController = widget.controller == null;
     _shouldDisposeFocusNode = widget.focusNode == null;
     _focusNode = widget.focusNode ?? FocusNode();
@@ -190,8 +190,7 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
         );
   }
 
-  @override
-  void dispose() {
+  @override void dispose() {
     if (_shouldDisposeController) _controller.dispose();
     if (_shouldDisposeFocusNode) _focusNode.dispose();
     super.dispose();
@@ -205,7 +204,7 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
           child: Tooltip(
             message: FormFieldsLocalizations.of(context)?.countryPickButtonTooltip ?? 'Pick a country',
             child: SwitchingImage(
-              imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country!, package: 'form_fields') : null,
+              imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country!) : null,
               type: SwitchingImageType.scale,
               fit: BoxFit.contain,
               idleChild: Center(
@@ -216,8 +215,7 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
         ),
       );
 
-  @override
-  Widget build(BuildContext context) {
+  @override Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final inputDecoration = widget.decoration ?? const InputDecoration(hintText: '', counterText: '');
 
