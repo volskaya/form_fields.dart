@@ -1,5 +1,6 @@
 library form_fields;
 
+export 'src/autocomplete_overlay.dart';
 export 'src/country_text_form_field.dart';
 export 'src/currency_text_input_formatter.dart';
 export 'src/l10n/form_fields_localizations.dart';
