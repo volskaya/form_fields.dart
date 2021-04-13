@@ -118,7 +118,7 @@ class _Widget extends StatelessWidget {
           ? Icon(
               PhotoFormField.photoIcon,
               size: index == 0 ? 48.0 : 24.0,
-              color: !state.hasError ? theme.hintColor : theme.colorScheme.error,
+              color: theme.hintColor,
             )
           : null,
     );
@@ -170,25 +170,31 @@ class _Widget extends StatelessWidget {
     final mainPhoto = AspectRatio(
       aspectRatio: 1,
       child: Stack(
+        clipBehavior: Clip.none,
         children: <Widget>[
           _buildImage(theme),
 
           // Error message.
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: FancySwitcher(
-              child: state.hasError && isNotEmpty(state.errorText)
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      child: Text(
-                        state.errorText!,
-                        style: theme.textTheme.caption!.apply(color: theme.colorScheme.error),
-                      ),
-                    )
-                  : null,
+          if (state.hasError && isNotEmpty(state.errorText))
+            Positioned(
+              bottom: 16.0,
+              right: 16.0,
+              child: PhysicalShape(
+                clipper: ShapeBorderClipper(shape: theme.cardTheme.shape!),
+                color: theme.colorScheme.error,
+                shadowColor: theme.cardTheme.shadowColor!,
+                clipBehavior: theme.cardTheme.clipBehavior!,
+                elevation: 1.0,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  child: Text(
+                    state.errorText!,
+                    style: theme.textTheme.caption!.apply(color: theme.colorScheme.onSurface),
+                    layoutTwice: true,
+                  ),
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
