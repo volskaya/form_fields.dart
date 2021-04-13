@@ -207,6 +207,7 @@ class AutocompleteOverlayState extends State<AutocompleteOverlay> {
     assert(_query.isEmpty, 'Destroy overlay after suggestions are gone');
     assert(_overlayEntry != null);
 
+    _query = '';
     _overlayEntry?.remove();
     _overlayEntry = null;
   }
@@ -292,7 +293,19 @@ class AutocompleteOverlayState extends State<AutocompleteOverlay> {
 
   OverlayEntry _buildOverlay() => OverlayEntry(
         builder: (context) {
-          final box = this.context.findRenderObject() as RenderBox?;
+          RenderBox? box;
+          try {
+            box = this.context.findRenderObject() as RenderBox?;
+          } catch (_) {
+            final entry = _overlayEntry;
+            try {
+              _overlayEntry?.remove();
+              _overlayEntry = null;
+            } catch (_) {
+              _overlayEntry = entry; // Give back the variable, if `remove()` failed.
+            }
+          }
+
           if (box == null) return const SizedBox.shrink();
 
           final offset = Offset(widget.overlayPadding.left, -widget.overlayPadding.bottom);
@@ -338,4 +351,12 @@ class AutocompleteOverlayState extends State<AutocompleteOverlay> {
           ),
         ),
       );
+}
+
+/// Implementation for autocompletion list widgets.
+abstract class AutocompletionListWidgetImpl {
+  String get query;
+  double get itemExtent;
+  void Function(String value) get handleSelect;
+  AutocompleteOverlaySwitcherBuilder get switcher;
 }

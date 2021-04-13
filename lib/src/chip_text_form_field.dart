@@ -38,6 +38,7 @@ class ChipTextFormField extends FormField<List<String>> {
     FormFieldAttachmentBuilder? attachmentBuilder,
     Widget? avatar,
     EditableChipWrap? wrap,
+    String? tooltip,
   }) : super(
           key: key,
           onSaved: onSaved,
@@ -55,10 +56,11 @@ class ChipTextFormField extends FormField<List<String>> {
             avatar: avatar,
             wrap: wrap,
             initialValue: initialValue,
+            tooltip: tooltip,
           ),
         );
 
-  static IconData flagIcon = Icons.flag;
+  static IconData addIcon = Icons.add_rounded;
 }
 
 class _Widget extends StatefulWidget {
@@ -72,6 +74,7 @@ class _Widget extends StatefulWidget {
     this.avatar,
     this.wrap,
     this.initialValue,
+    this.tooltip,
   });
 
   final FormFieldState<List<String>> state;
@@ -83,6 +86,7 @@ class _Widget extends StatefulWidget {
   final Widget? avatar;
   final EditableChipWrap? wrap;
   final List<String>? initialValue;
+  final String? tooltip;
 
   @override
   __WidgetState createState() => __WidgetState();
@@ -250,8 +254,9 @@ class __WidgetState extends State<_Widget> {
         errorText: widget.state.hasError ? widget.state.errorText : null,
         contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
         suffixIcon: IconButton(
-          icon: const Icon(Icons.add),
+          icon: Icon(ChipTextFormField.addIcon),
           onPressed: addChip,
+          tooltip: widget.tooltip,
         ),
       ),
     );
