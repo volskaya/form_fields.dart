@@ -17,6 +17,7 @@ dependencies:
   json_annotation: ^4.0.1
   image_picker: ^0.7.3
   freezed_annotation: ^0.14.1
+  provider: ^5.0.0
 
   firebase_image:
     path: /home/projects/packages/firebase_image
