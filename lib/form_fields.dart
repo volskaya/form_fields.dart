@@ -2,6 +2,7 @@ library form_fields;
 
 export 'src/autocomplete_overlay.dart';
 export 'src/chip_text_form_field.dart';
+export 'src/chip_toggle_form_field.dart';
 export 'src/country_text_form_field.dart';
 export 'src/currency_text_input_formatter.dart';
 export 'src/editable_chip.dart';

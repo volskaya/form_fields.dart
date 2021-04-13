@@ -1,11 +1,11 @@
 import 'package:form_fields/src/editable_chip.dart';
-import 'package:form_fields/src/typedefs.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 part 'chip_text_form_field.freezed.dart';
+
+// TODO(volskaya): Handle `enabled`.
 
 @freezed
 class _Chip with _$_Chip {
@@ -27,7 +27,6 @@ class ChipTextFormField extends FormField<List<String>> {
   ChipTextFormField({
     Key? key,
     List<String>? initialValue,
-    String? currency,
     FormFieldSetter<List<String>>? onSaved,
     FormFieldValidator<List<String>>? validator,
     ValueChanged<List<String>?>? onChanged,
@@ -35,7 +34,6 @@ class ChipTextFormField extends FormField<List<String>> {
     bool enabled = true,
     InputDecoration? decoration,
     TextStyle? style,
-    FormFieldAttachmentBuilder? attachmentBuilder,
     Widget? avatar,
     EditableChipWrap? wrap,
     String? tooltip,
@@ -51,11 +49,8 @@ class ChipTextFormField extends FormField<List<String>> {
             onChanged: onChanged,
             decoration: decoration,
             style: style,
-            attachmentBuilder: attachmentBuilder,
-            currency: currency,
             avatar: avatar,
             wrap: wrap,
-            initialValue: initialValue,
             tooltip: tooltip,
           ),
         );
@@ -69,11 +64,8 @@ class _Widget extends StatefulWidget {
     this.onChanged,
     this.decoration,
     this.style,
-    this.attachmentBuilder,
-    this.currency,
     this.avatar,
     this.wrap,
-    this.initialValue,
     this.tooltip,
   });
 
@@ -81,11 +73,8 @@ class _Widget extends StatefulWidget {
   final ValueChanged<List<String>?>? onChanged;
   final InputDecoration? decoration;
   final TextStyle? style;
-  final FormFieldAttachmentBuilder? attachmentBuilder;
-  final String? currency;
   final Widget? avatar;
   final EditableChipWrap? wrap;
-  final List<String>? initialValue;
   final String? tooltip;
 
   @override
@@ -217,7 +206,7 @@ class __WidgetState extends State<_Widget> {
 
   @override
   void initState() {
-    for (final val in widget.initialValue ?? const <String>[]) {
+    for (final val in widget.state.value ?? const <String>[]) {
       addChip(initialValue: val, scrollToEnd: false, requestFocus: false);
     }
     super.initState();
