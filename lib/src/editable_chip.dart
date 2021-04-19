@@ -70,10 +70,9 @@ class EditableChipState extends State<EditableChip>
 
   void _handleEditableChanged(String val) {
     if (val.isEmpty) return;
-    final value = val.split('');
-    if (value.removeLast() == widget.breakPoint) {
+    if (val.contains(widget.breakPoint)) {
       widget.onBreakPoint?.call();
-      _controller.text = value.join('');
+      _controller.text = val.split(',').first;
     }
   }
 
@@ -227,6 +226,8 @@ class EditableChipState extends State<EditableChip>
           backgroundCursorColor: cursorColor,
           selectionColor: theme.textSelectionTheme.selectionColor,
           keyboardAppearance: theme.brightness,
+          keyboardType: TextInputType.text,
+          textCapitalization: TextCapitalization.sentences,
           paintCursorAboveText: paintCursorAboveText,
           cursorOpacityAnimates: cursorOpacityAnimates,
           cursorOffset: cursorOffset,

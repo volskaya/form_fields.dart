@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:fancy_switcher/fancy_switcher.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_image/firebase_image.dart';
 import 'package:form_fields/src/overlayed_ink_well.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:log/log.dart';
 import 'package:quiver/strings.dart';
 
@@ -52,22 +52,25 @@ class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue?>> {
   static IconData photoIcon = Icons.image;
   static int maxSecondaryPhotos = 4;
 
-  static Future<File?> pickImage({bool useCamera = false}) async {
-    final picker = ImagePicker();
-    File? file;
-
+  static Future<List<File>> pickImages({
+    bool useCamera = false,
+    bool allowMultiple = true,
+  }) async {
     try {
-      final pickedFile = await picker.getImage(
-        source: useCamera ? ImageSource.camera : ImageSource.gallery,
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        allowMultiple: allowMultiple,
       );
 
-      file = pickedFile != null ? File(pickedFile.path) : null;
-    } catch (e) {
-      final response = await picker.getLostData();
-      file = response.type == RetrieveType.image ? File(response.file!.path) : null;
-    }
+      return result?.files.where((x) => x.path?.isNotEmpty == true).map((x) => File(x.path!)).toList(growable: false) ??
+          const <File>[];
+    } catch (_) {}
 
-    return file;
+    return const <File>[];
+  }
+
+  static Future<File?> pickImage({bool useCamera = false}) async {
+    return (await pickImages(allowMultiple: false)).firstOrNull;
   }
 }
 
@@ -93,18 +96,41 @@ class _Widget extends StatelessWidget {
 
   static final _log = Log.named('PhotoFormField');
 
-  Future _handleTap({int id = 0, bool remove = false}) async {
-    final photo = !remove ? await PhotoFormField.pickImage() : null;
+  static Future<List<File>> _pickImages(bool single) async {
+    if (single) {
+      final file = await PhotoFormField.pickImage();
+      return file != null ? [file] : const <File>[];
+    } else {
+      return PhotoFormField.pickImages();
+    }
+  }
 
-    if (photo == null && !remove) {
+  Future _handleTap({int id = 0, bool remove = false}) async {
+    final photos = !remove ? await _pickImages(singlePhoto) : null;
+    final remainingPhotos = !singlePhoto ? 4 - id : 0;
+
+    if (photos?.isNotEmpty != true && !remove) {
       return _log.w('Picker returned no image, skipping…');
-    } else if (id == 0 && photo == null) {
+    } else if (id == 0 && photos == null) {
       // Main photo deleted.
       state.didChange(const <int, PhotoFormFieldValue>{});
     } else {
-      // Only handle the index photo.
-      state.didChange(Map<int, PhotoFormFieldValue?>.from(state.value ?? const <int, PhotoFormFieldValue?>{})
-        ..[id] = photo != null ? PhotoFormFieldValue.local(file: photo) : null);
+      final newValue = Map<int, PhotoFormFieldValue?>.from(state.value ?? const <int, PhotoFormFieldValue?>{});
+
+      if (photos == null) {
+        newValue[id] = null;
+      } else {
+        for (var i = 0; i < photos.length; i += 1) {
+          if (i > remainingPhotos) break;
+
+          final key = id + i;
+          final photo = photos[i];
+
+          newValue[key] = PhotoFormFieldValue.local(file: photo);
+        }
+      }
+
+      state.didChange(newValue);
     }
   }
 
