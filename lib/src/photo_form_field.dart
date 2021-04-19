@@ -345,10 +345,9 @@ class _ImageWidget extends StatelessWidget {
 
           return interactive
               ? Draggable<int>(
-                  affinity: Axis.vertical,
-                  hitTestBehavior: HitTestBehavior.opaque,
                   data: index,
-                  maxSimultaneousDrags: 1,
+                  maxSimultaneousDrags: imageProvider != null ? 1 : 0,
+                  ignoringFeedbackSemantics: true,
                   rootOverlay: true,
                   dragAnchorStrategy: (_, __, ___) => const Offset(56.0, 56.0) / 2,
                   onDragStarted: () => Feedback.forLongPress(context),
