@@ -5,18 +5,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:material_dialog/material_dialog.dart';
 
+typedef MultiItemFormFieldBuilderOpenPicker<T> = Future<Set<T>> Function(BuildContext context);
+typedef MultiItemFormFieldBuilderGetToggle<T> = VoidCallback? Function(T item);
 typedef MultiItemFormFieldBuilderToggleCallback<T> = void Function(T item);
 typedef MultiItemFormFieldBuilderFieldBuilder<T> = Widget Function(
   BuildContext context,
   Set<T> value,
-  Future<Set<T>> Function(BuildContext context) openPicker,
-  VoidCallback? Function(T item) getToggle,
+  MultiItemFormFieldBuilderOpenPicker<T> openPicker,
+  MultiItemFormFieldBuilderGetToggle<T> getToggle,
+  void Function(T a, T b) swapValues,
 );
 typedef MultiItemFormFieldBuilderContentBuilder<T> = Widget Function(
   BuildContext context,
   ValueNotifier<Set<T>?> notifier,
   ScrollController scrollController,
-  VoidCallback? Function(T item) getToggle,
+  MultiItemFormFieldBuilderGetToggle<T> getToggle,
 );
 
 class MultiItemFormFieldBuilder<T> extends FormField<Set<T>> {
@@ -166,6 +169,31 @@ class _Widget<T> extends StatelessWidget {
     return value ?? state.value ?? <T>{};
   }
 
+  /// Swaps `a` -> `b`.
+  void _swapValues(T a, T b) {
+    assert(state.value?.contains(a) == true);
+    assert(state.value?.contains(b) == true);
+
+    final list = state.value?.toList(growable: false) ?? <T>[];
+    final indexOfA = list.indexOf(a);
+    final indexOfB = list.indexOf(b);
+    final newList = List<T>.generate(
+      list.length,
+      (i) {
+        if (i == indexOfA) {
+          return b;
+        } else if (i == indexOfB) {
+          return a;
+        } else {
+          return list[i];
+        }
+      },
+      growable: false,
+    );
+
+    _updateValue(newList.toSet());
+  }
+
   @override
   Widget build(BuildContext context) {
     final inputDecoration = decoration ?? const InputDecoration(counterText: '');
@@ -182,7 +210,7 @@ class _Widget<T> extends StatelessWidget {
 
     return InputDecorator(
       isEmpty: state.value?.isNotEmpty != true,
-      child: fieldBuilder(context, state.value ?? <T>{}, _pickUnit, getToggle),
+      child: fieldBuilder(context, state.value ?? <T>{}, _pickUnit, getToggle, _swapValues),
       decoration: inputDecoration.copyWith(
         errorText: state.hasError ? state.errorText : null,
         counterText: inputDecoration.hintText ?? (max != null ? '${state.value?.length ?? 0}/$max' : null),
