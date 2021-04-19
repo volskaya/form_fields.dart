@@ -134,7 +134,7 @@ class _Widget extends StatelessWidget {
     }
   }
 
-  Widget _buildImage(ThemeData theme, [int index = 0]) {
+  Widget _buildImage(BuildContext context, ThemeData theme, [int index = 0]) {
     final defaultIdleChild = AnimatedContainer(
       duration: switchDuration,
       curve: standardEasing,
@@ -150,55 +150,54 @@ class _Widget extends StatelessWidget {
     );
 
     final idleChild = idleBuilder?.call(
-          state.context,
+          context,
           defaultIdleChild,
           state.hasError ? state.errorText : null,
         ) ??
         defaultIdleChild;
 
-    final image = LayoutBuilder(
-      builder: (_, c) {
-        final imageProvider = state.value?[index]?.map(
-          local: (value) => FileImage(value.file),
-          online: (value) => value.imageProvider,
-        );
+    return DragTarget<int>(
+      builder: (context, candidateData, rejectedData) {
+        final candidate = candidateData.firstOrNull;
+        final imageIndex = candidate ?? index;
 
-        if (imageProvider is FirebaseImage) {
-          imageProvider.setCacheSize(FirebaseImage.getCacheSize(imageProvider.size, c.biggest));
-        }
-
-        return SwitchingFirebaseImage(
-          imageProvider: imageProvider,
-          type: interactive ? SwitchingImageType.scale : SwitchingImageType.fade,
+        return _ImageWidget(
+          index: index,
           idleChild: idleChild,
           borderRadius: borderRadius,
+          interactive: interactive,
+          imageProvider: state.value?[imageIndex]?.map(
+            local: (value) => FileImage(value.file),
+            online: (value) => value.imageProvider,
+          ),
+          onTap: state.widget.enabled && index == 0 || state.value?.containsKey(0) == true
+              ? () => _handleTap(id: index)
+              : null,
+          onLongPress: state.widget.enabled && state.value?.containsKey(index) == true
+              ? () => _handleTap(id: index, remove: true)
+              : null,
         );
       },
+      onAccept: (acceptedIndex) {
+        final newValue = Map<int, PhotoFormFieldValue?>.from(state.value ?? const <int, PhotoFormFieldValue?>{});
+        final currentIndexValue = newValue[index];
+        newValue[index] = newValue[acceptedIndex];
+        newValue[acceptedIndex] = currentIndexValue;
+        state.didChange(newValue);
+        Feedback.forLongPress(context);
+      },
     );
-
-    return interactive
-        ? OverlayedInkWell(
-            borderRadius: borderRadius,
-            child: image,
-            onTap: state.widget.enabled && index == 0 || state.value?.containsKey(0) == true
-                ? () => _handleTap(id: index)
-                : null,
-            onLongPress: state.widget.enabled && state.value?.containsKey(index) == true
-                ? () => _handleTap(id: index, remove: true)
-                : null,
-          )
-        : image;
   }
 
   @override
-  Widget build(BuildContext _) {
-    final theme = Theme.of(state.context);
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final mainPhoto = AspectRatio(
       aspectRatio: 1,
       child: Stack(
         clipBehavior: Clip.none,
         children: <Widget>[
-          _buildImage(theme),
+          _buildImage(context, theme),
 
           // Error message.
           if (state.hasError && isNotEmpty(state.errorText))
@@ -262,7 +261,7 @@ class _Widget extends StatelessWidget {
                               flex: 1,
                               child: AspectRatio(
                                 aspectRatio: 1,
-                                child: _buildImage(theme, index + 1),
+                                child: _buildImage(context, theme, index + 1),
                               ),
                             ),
                             growable: false,
@@ -279,4 +278,88 @@ class _Widget extends StatelessWidget {
             ],
           );
   }
+}
+
+class _ImageWidget extends StatelessWidget {
+  const _ImageWidget({
+    Key? key,
+    required this.index,
+    required this.imageProvider,
+    required this.idleChild,
+    required this.borderRadius,
+    required this.interactive,
+    required this.onTap,
+    required this.onLongPress,
+  }) : super(key: key);
+
+  final int index;
+  final ImageProvider? imageProvider;
+  final Widget idleChild;
+  final BorderRadius? borderRadius;
+  final bool interactive;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+
+  Widget _buildImage(
+    ImageProvider? imageProvider,
+    Size constraints, {
+    VoidCallback? onTap,
+    VoidCallback? onLongPress,
+    bool interactive = true,
+  }) {
+    ImageProvider? image = imageProvider;
+
+    if (image is FirebaseImage) {
+      image = image.copyWith(cacheSize: FirebaseImage.getCacheSize(image.size, constraints));
+    }
+
+    Widget widget = SwitchingFirebaseImage(
+      imageProvider: image,
+      type: interactive ? SwitchingImageType.scale : SwitchingImageType.fade,
+      idleChild: idleChild,
+      borderRadius: borderRadius,
+    );
+
+    if (interactive) {
+      widget = OverlayedInkWell(
+        borderRadius: borderRadius,
+        child: widget,
+        onTap: onTap,
+        onLongPress: onLongPress,
+      );
+    }
+
+    return widget;
+  }
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, c) {
+          final widget = _buildImage(
+            imageProvider,
+            c.biggest,
+            onTap: onTap,
+            onLongPress: onLongPress,
+            interactive: interactive,
+          );
+
+          return interactive
+              ? Draggable<int>(
+                  affinity: Axis.vertical,
+                  hitTestBehavior: HitTestBehavior.opaque,
+                  data: index,
+                  maxSimultaneousDrags: 1,
+                  rootOverlay: true,
+                  dragAnchorStrategy: (_, __, ___) => const Offset(56.0, 56.0) / 2,
+                  onDragStarted: () => Feedback.forLongPress(context),
+                  child: widget, // Match tree with `childWhenDragging`.
+                  childWhenDragging: _buildImage(null, c.biggest, interactive: interactive), // Match tree with `child`.
+                  feedback: SizedBox.fromSize(
+                    size: const Size.square(56.0),
+                    child: _buildImage(imageProvider, c.biggest, interactive: false),
+                  ),
+                )
+              : widget;
+        },
+      );
 }
