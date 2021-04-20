@@ -15,8 +15,8 @@ typedef PhotoFormFieldIdleBuilder = Widget Function(BuildContext context, Widget
 
 @freezed
 class PhotoFormFieldValue with _$PhotoFormFieldValue {
-  const factory PhotoFormFieldValue.local({required File file}) = _LocalFileValue;
-  const factory PhotoFormFieldValue.online({required ImageProvider imageProvider}) = _OnlineFileValue;
+  const factory PhotoFormFieldValue.local({required File file, FirebaseImage? previousValue}) = _LocalFileValue;
+  const factory PhotoFormFieldValue.online({required FirebaseImage imageProvider}) = _OnlineFileValue;
 }
 
 class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue?>> {
@@ -126,7 +126,13 @@ class _Widget extends StatelessWidget {
           final key = id + i;
           final photo = photos[i];
 
-          newValue[key] = PhotoFormFieldValue.local(file: photo);
+          newValue[key] = PhotoFormFieldValue.local(
+            file: photo,
+            previousValue: state.value?[key]?.map(
+              online: (v) => v.imageProvider,
+              local: (v) => v.previousValue,
+            ),
+          );
         }
       }
 
@@ -346,7 +352,7 @@ class _ImageWidget extends StatelessWidget {
           return interactive
               ? Draggable<int>(
                   data: index,
-                  maxSimultaneousDrags: imageProvider != null ? 1 : 0,
+                  maxSimultaneousDrags: imageProvider != null ? 1 : 0, // Disable while there's no image.
                   ignoringFeedbackSemantics: true,
                   rootOverlay: true,
                   dragAnchorStrategy: (_, __, ___) => const Offset(56.0, 56.0) / 2,

@@ -16,13 +16,14 @@ final _privateConstructorUsedError = UnsupportedError(
 class _$PhotoFormFieldValueTearOff {
   const _$PhotoFormFieldValueTearOff();
 
-  _LocalFileValue local({required File file}) {
+  _LocalFileValue local({required File file, FirebaseImage? previousValue}) {
     return _LocalFileValue(
       file: file,
+      previousValue: previousValue,
     );
   }
 
-  _OnlineFileValue online({required ImageProvider<Object> imageProvider}) {
+  _OnlineFileValue online({required FirebaseImage imageProvider}) {
     return _OnlineFileValue(
       imageProvider: imageProvider,
     );
@@ -36,14 +37,14 @@ const $PhotoFormFieldValue = _$PhotoFormFieldValueTearOff();
 mixin _$PhotoFormFieldValue {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(File file) local,
-    required TResult Function(ImageProvider<Object> imageProvider) online,
+    required TResult Function(File file, FirebaseImage? previousValue) local,
+    required TResult Function(FirebaseImage imageProvider) online,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(File file)? local,
-    TResult Function(ImageProvider<Object> imageProvider)? online,
+    TResult Function(File file, FirebaseImage? previousValue)? local,
+    TResult Function(FirebaseImage imageProvider)? online,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -84,7 +85,7 @@ abstract class _$LocalFileValueCopyWith<$Res> {
   factory _$LocalFileValueCopyWith(
           _LocalFileValue value, $Res Function(_LocalFileValue) then) =
       __$LocalFileValueCopyWithImpl<$Res>;
-  $Res call({File file});
+  $Res call({File file, FirebaseImage? previousValue});
 }
 
 /// @nodoc
@@ -101,26 +102,33 @@ class __$LocalFileValueCopyWithImpl<$Res>
   @override
   $Res call({
     Object? file = freezed,
+    Object? previousValue = freezed,
   }) {
     return _then(_LocalFileValue(
       file: file == freezed
           ? _value.file
           : file // ignore: cast_nullable_to_non_nullable
               as File,
+      previousValue: previousValue == freezed
+          ? _value.previousValue
+          : previousValue // ignore: cast_nullable_to_non_nullable
+              as FirebaseImage?,
     ));
   }
 }
 
 /// @nodoc
 class _$_LocalFileValue implements _LocalFileValue {
-  const _$_LocalFileValue({required this.file});
+  const _$_LocalFileValue({required this.file, this.previousValue});
 
   @override
   final File file;
+  @override
+  final FirebaseImage? previousValue;
 
   @override
   String toString() {
-    return 'PhotoFormFieldValue.local(file: $file)';
+    return 'PhotoFormFieldValue.local(file: $file, previousValue: $previousValue)';
   }
 
   @override
@@ -128,12 +136,17 @@ class _$_LocalFileValue implements _LocalFileValue {
     return identical(this, other) ||
         (other is _LocalFileValue &&
             (identical(other.file, file) ||
-                const DeepCollectionEquality().equals(other.file, file)));
+                const DeepCollectionEquality().equals(other.file, file)) &&
+            (identical(other.previousValue, previousValue) ||
+                const DeepCollectionEquality()
+                    .equals(other.previousValue, previousValue)));
   }
 
   @override
   int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(file);
+      runtimeType.hashCode ^
+      const DeepCollectionEquality().hash(file) ^
+      const DeepCollectionEquality().hash(previousValue);
 
   @JsonKey(ignore: true)
   @override
@@ -143,21 +156,21 @@ class _$_LocalFileValue implements _LocalFileValue {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(File file) local,
-    required TResult Function(ImageProvider<Object> imageProvider) online,
+    required TResult Function(File file, FirebaseImage? previousValue) local,
+    required TResult Function(FirebaseImage imageProvider) online,
   }) {
-    return local(file);
+    return local(file, previousValue);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(File file)? local,
-    TResult Function(ImageProvider<Object> imageProvider)? online,
+    TResult Function(File file, FirebaseImage? previousValue)? local,
+    TResult Function(FirebaseImage imageProvider)? online,
     required TResult orElse(),
   }) {
     if (local != null) {
-      return local(file);
+      return local(file, previousValue);
     }
     return orElse();
   }
@@ -186,9 +199,11 @@ class _$_LocalFileValue implements _LocalFileValue {
 }
 
 abstract class _LocalFileValue implements PhotoFormFieldValue {
-  const factory _LocalFileValue({required File file}) = _$_LocalFileValue;
+  const factory _LocalFileValue(
+      {required File file, FirebaseImage? previousValue}) = _$_LocalFileValue;
 
   File get file => throw _privateConstructorUsedError;
+  FirebaseImage? get previousValue => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   _$LocalFileValueCopyWith<_LocalFileValue> get copyWith =>
       throw _privateConstructorUsedError;
@@ -199,7 +214,7 @@ abstract class _$OnlineFileValueCopyWith<$Res> {
   factory _$OnlineFileValueCopyWith(
           _OnlineFileValue value, $Res Function(_OnlineFileValue) then) =
       __$OnlineFileValueCopyWithImpl<$Res>;
-  $Res call({ImageProvider<Object> imageProvider});
+  $Res call({FirebaseImage imageProvider});
 }
 
 /// @nodoc
@@ -221,7 +236,7 @@ class __$OnlineFileValueCopyWithImpl<$Res>
       imageProvider: imageProvider == freezed
           ? _value.imageProvider
           : imageProvider // ignore: cast_nullable_to_non_nullable
-              as ImageProvider<Object>,
+              as FirebaseImage,
     ));
   }
 }
@@ -231,7 +246,7 @@ class _$_OnlineFileValue implements _OnlineFileValue {
   const _$_OnlineFileValue({required this.imageProvider});
 
   @override
-  final ImageProvider<Object> imageProvider;
+  final FirebaseImage imageProvider;
 
   @override
   String toString() {
@@ -259,8 +274,8 @@ class _$_OnlineFileValue implements _OnlineFileValue {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(File file) local,
-    required TResult Function(ImageProvider<Object> imageProvider) online,
+    required TResult Function(File file, FirebaseImage? previousValue) local,
+    required TResult Function(FirebaseImage imageProvider) online,
   }) {
     return online(imageProvider);
   }
@@ -268,8 +283,8 @@ class _$_OnlineFileValue implements _OnlineFileValue {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(File file)? local,
-    TResult Function(ImageProvider<Object> imageProvider)? online,
+    TResult Function(File file, FirebaseImage? previousValue)? local,
+    TResult Function(FirebaseImage imageProvider)? online,
     required TResult orElse(),
   }) {
     if (online != null) {
@@ -302,10 +317,10 @@ class _$_OnlineFileValue implements _OnlineFileValue {
 }
 
 abstract class _OnlineFileValue implements PhotoFormFieldValue {
-  const factory _OnlineFileValue(
-      {required ImageProvider<Object> imageProvider}) = _$_OnlineFileValue;
+  const factory _OnlineFileValue({required FirebaseImage imageProvider}) =
+      _$_OnlineFileValue;
 
-  ImageProvider<Object> get imageProvider => throw _privateConstructorUsedError;
+  FirebaseImage get imageProvider => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   _$OnlineFileValueCopyWith<_OnlineFileValue> get copyWith =>
       throw _privateConstructorUsedError;
