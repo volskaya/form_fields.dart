@@ -24,7 +24,8 @@ class CurrencyTextInputFormatter extends TextInputFormatter {
 
   static bool _lastCharacterIsDigit(String text) => RegExp('[0-9]').hasMatch(text.substring(text.length - 1));
 
-  @override TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     final isInsertedCharacter =
         oldValue.text.length + 1 == newValue.text.length && newValue.text.startsWith(oldValue.text);
     final isRemovedCharacter =

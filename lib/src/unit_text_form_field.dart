@@ -94,7 +94,8 @@ class _Widget<T> extends StatefulWidget {
   final bool Function(T? value)? getValueState;
   final FormFieldAttachmentBuilder? attachmentBuilder;
 
-  @override __WidgetState<T> createState() => __WidgetState<T>();
+  @override
+  __WidgetState<T> createState() => __WidgetState<T>();
 }
 
 class __WidgetState<T> extends State<_Widget<T>> {
@@ -199,7 +200,8 @@ class __WidgetState<T> extends State<_Widget<T>> {
       WidgetsBinding.instance!.addPostFrameCallback((_) => mounted ? _focusNode.unfocus() : null);
   }
 
-  @override void initState() {
+  @override
+  void initState() {
     super.initState();
     _shouldDisposeController = widget.controller == null;
     _shouldDisposeFocusNode = widget.focusNode == null;
@@ -208,13 +210,15 @@ class __WidgetState<T> extends State<_Widget<T>> {
         TextEditingController(text: widget.state.value != null ? widget.getText(widget.state.value!) : '');
   }
 
-  @override void dispose() {
+  @override
+  void dispose() {
     if (_shouldDisposeController) _controller.dispose();
     if (_shouldDisposeFocusNode) _focusNode.dispose();
     super.dispose();
   }
 
-  @override Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final inputDecoration = widget.decoration ?? const InputDecoration(hintText: '', counterText: '');
 

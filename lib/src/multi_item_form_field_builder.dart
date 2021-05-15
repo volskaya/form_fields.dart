@@ -196,7 +196,7 @@ class _Widget<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final inputDecoration = decoration ?? const InputDecoration(counterText: '');
+    final inputDecoration = decoration ?? const InputDecoration(hintText: '');
     final toggledCount = state.value?.length ?? 0;
     final minimumNotReached = () => min == null || toggledCount > min!;
     final maximumNotReached = () => max == null || toggledCount < max!;
@@ -213,7 +213,7 @@ class _Widget<T> extends StatelessWidget {
       child: fieldBuilder(context, state.value ?? <T>{}, _pickUnit, getToggle, _swapValues),
       decoration: inputDecoration.copyWith(
         errorText: state.hasError ? state.errorText : null,
-        counterText: inputDecoration.hintText ?? (max != null ? '${state.value?.length ?? 0}/$max' : null),
+        counterText: inputDecoration.counterText ?? (max != null ? '${state.value?.length ?? 0}/$max' : null),
       ),
     );
   }

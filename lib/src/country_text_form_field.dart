@@ -65,7 +65,8 @@ class _Widget extends StatefulWidget {
   final TextStyle? style;
   final FormFieldAttachmentBuilder? attachmentBuilder;
 
-  @override __WidgetState createState() => __WidgetState();
+  @override
+  __WidgetState createState() => __WidgetState();
 }
 
 class __WidgetState extends State<_Widget> with InitialDependencies {
@@ -180,7 +181,8 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
       );
   }
 
-  @override void initDependencies() {
+  @override
+  void initDependencies() {
     _shouldDisposeController = widget.controller == null;
     _shouldDisposeFocusNode = widget.focusNode == null;
     _focusNode = widget.focusNode ?? FocusNode();
@@ -190,7 +192,8 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
         );
   }
 
-  @override void dispose() {
+  @override
+  void dispose() {
     if (_shouldDisposeController) _controller.dispose();
     if (_shouldDisposeFocusNode) _focusNode.dispose();
     super.dispose();
@@ -215,7 +218,8 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
         ),
       );
 
-  @override Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final inputDecoration = widget.decoration ?? const InputDecoration(hintText: '', counterText: '');
 

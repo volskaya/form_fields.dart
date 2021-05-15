@@ -75,7 +75,8 @@ class _Widget extends StatefulWidget {
   final bool readOnly;
   final FormFieldAttachmentBuilder? attachmentBuilder;
 
-  @override __WidgetState createState() => __WidgetState();
+  @override
+  __WidgetState createState() => __WidgetState();
 }
 
 class __WidgetState extends State<_Widget> {
@@ -208,7 +209,8 @@ class __WidgetState extends State<_Widget> {
       );
   }
 
-  @override void initState() {
+  @override
+  void initState() {
     super.initState();
 
     _shouldDisposeController = widget.controller == null;
@@ -219,7 +221,8 @@ class __WidgetState extends State<_Widget> {
     _deriveCountryFromText();
   }
 
-  @override void dispose() {
+  @override
+  void dispose() {
     super.dispose();
     _countryNotifier.dispose();
     _controller.removeListener(_handleChange);
@@ -244,7 +247,8 @@ class __WidgetState extends State<_Widget> {
         ),
       );
 
-  @override Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final inputDecoration = widget.decoration ?? const InputDecoration(hintText: '', counterText: '');
 

@@ -62,7 +62,8 @@ class _Widget extends StatefulWidget {
   final FormFieldAttachmentBuilder? attachmentBuilder;
   final String? currency;
 
-  @override __WidgetState createState() => __WidgetState();
+  @override
+  __WidgetState createState() => __WidgetState();
 }
 
 class __WidgetState extends State<_Widget> {
@@ -82,7 +83,8 @@ class __WidgetState extends State<_Widget> {
     widget.state.didChange(value);
   }
 
-  @override void initState() {
+  @override
+  void initState() {
     _shouldDisposeController = widget.controller == null;
     _shouldDisposeFocusNode = widget.focusNode == null;
     _focusNode = widget.focusNode ?? FocusNode();
@@ -96,14 +98,16 @@ class __WidgetState extends State<_Widget> {
     super.initState();
   }
 
-  @override void dispose() {
+  @override
+  void dispose() {
     super.dispose();
     _controller.removeListener(_handleControllerChange);
     if (_shouldDisposeController) _controller.dispose();
     if (_shouldDisposeFocusNode) _focusNode.dispose();
   }
 
-  @override Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final inputDecoration = widget.decoration ?? const InputDecoration(hintText: '', counterText: '');
     final inputFormatter = CurrencyTextInputFormatter(
