@@ -240,6 +240,7 @@ class __WidgetState extends State<_Widget> {
             imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country!) : null,
             type: SwitchingImageType.scale,
             fit: BoxFit.contain,
+            expandBox: true,
             idleChild: Center(
               child: Icon(PhoneTextFormField.flagIcon),
             ),

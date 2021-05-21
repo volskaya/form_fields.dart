@@ -208,6 +208,7 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
             message: FormFieldsLocalizations.of(context)?.countryPickButtonTooltip ?? 'Pick a country',
             child: SwitchingImage(
               imageProvider: isNotEmpty(country?.alphaCode2) ? Country.imageOf(country!) : null,
+              expandBox: true,
               type: SwitchingImageType.scale,
               fit: BoxFit.contain,
               idleChild: Center(
