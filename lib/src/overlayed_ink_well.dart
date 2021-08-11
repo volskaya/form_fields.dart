@@ -9,6 +9,7 @@ class OverlayedInkWell extends StatelessWidget {
     this.onTapCancel,
     this.fit = StackFit.passthrough,
     this.borderRadius,
+    this.shape,
   }) : super(key: key);
 
   final Widget child;
@@ -16,6 +17,7 @@ class OverlayedInkWell extends StatelessWidget {
   final VoidCallback? onLongPress;
   final VoidCallback? onTapCancel;
   final BorderRadius? borderRadius;
+  final ShapeBorder? shape;
   final StackFit fit;
 
   @override
@@ -28,11 +30,13 @@ class OverlayedInkWell extends StatelessWidget {
             child: Material(
               type: MaterialType.transparency,
               borderRadius: borderRadius,
+              shape: shape,
               child: InkWell(
                 onTap: onTap,
                 onLongPress: onLongPress,
                 onTapCancel: onTapCancel,
                 borderRadius: borderRadius,
+                customBorder: shape,
               ),
             ),
           ),

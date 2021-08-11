@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:fancy_switcher/fancy_switcher.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_image/firebase_image.dart';
+import 'package:flutter/material.dart';
 import 'package:form_fields/src/overlayed_ink_well.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:flutter/material.dart';
 import 'package:log/log.dart';
 import 'package:quiver/strings.dart';
 
@@ -25,12 +25,17 @@ class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue?>> {
     bool singlePhoto = false,
     EdgeInsets secondaryPhotoPadding = EdgeInsets.zero,
     FormFieldSetter<Map<int, PhotoFormFieldValue?>>? onSaved,
+    FormFieldSetter<Map<int, PhotoFormFieldValue?>>? onChanged,
     FormFieldValidator<Map<int, PhotoFormFieldValue?>>? validator,
     Map<int, PhotoFormFieldValue?> initialValue = const <int, PhotoFormFieldValue?>{},
     AutovalidateMode autovalidateMode = AutovalidateMode.disabled,
     bool enabled = true,
+    bool enableReorder = false,
     PhotoFormFieldIdleBuilder? idleBuilder,
     BorderRadius? borderRadius,
+    ShapeBorder? shape,
+    BorderRadius? secondaryBorderRadius,
+    ShapeBorder? secondaryShape,
     Duration switchDuration = const Duration(milliseconds: 250),
   }) : super(
           onSaved: onSaved,
@@ -45,7 +50,12 @@ class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue?>> {
             secondaryPhotoPadding: secondaryPhotoPadding,
             idleBuilder: idleBuilder,
             borderRadius: borderRadius,
+            shape: shape,
+            secondaryBorderRadius: secondaryBorderRadius,
+            secondaryShape: secondaryShape,
             switchDuration: switchDuration,
+            enableReorder: enableReorder,
+            onChanged: onChanged,
           ),
         );
 
@@ -82,8 +92,13 @@ class _Widget extends StatelessWidget {
     required this.singlePhoto,
     this.secondaryPhotoPadding = EdgeInsets.zero,
     this.idleBuilder,
-    this.borderRadius,
     this.switchDuration = const Duration(milliseconds: 250),
+    this.enableReorder = false,
+    this.borderRadius,
+    this.secondaryBorderRadius,
+    this.shape,
+    this.secondaryShape,
+    this.onChanged,
   }) : super(key: key);
 
   final FormFieldState<Map<int, PhotoFormFieldValue?>> state;
@@ -91,8 +106,13 @@ class _Widget extends StatelessWidget {
   final bool interactive;
   final bool singlePhoto;
   final PhotoFormFieldIdleBuilder? idleBuilder;
-  final BorderRadius? borderRadius;
   final Duration switchDuration;
+  final bool enableReorder;
+  final BorderRadius? borderRadius;
+  final ShapeBorder? shape;
+  final BorderRadius? secondaryBorderRadius;
+  final ShapeBorder? secondaryShape;
+  final FormFieldSetter<Map<int, PhotoFormFieldValue?>>? onChanged;
 
   static final _log = Log.named('PhotoFormField');
 
@@ -137,7 +157,40 @@ class _Widget extends StatelessWidget {
       }
 
       state.didChange(newValue);
+      onChanged?.call(newValue);
     }
+  }
+
+  Widget _buildImageWidget(BuildContext _, int index, int imageIndex, Widget idleChild) {
+    ShapeBorder? shape;
+    BorderRadius? borderRadius;
+
+    if (index > 0 && (secondaryBorderRadius != null || secondaryShape != null)) {
+      shape = secondaryShape;
+      borderRadius = secondaryBorderRadius;
+    } else {
+      shape = this.shape;
+      borderRadius = this.borderRadius;
+    }
+
+    return _ImageWidget(
+      index: index,
+      idleChild: idleChild,
+      borderRadius: borderRadius,
+      shape: shape,
+      interactive: interactive,
+      draggable: enableReorder && !singlePhoto,
+      imageProvider: state.value?[imageIndex]?.map(
+        local: (value) => FileImage(value.file),
+        online: (value) => value.imageProvider,
+      ),
+      onTap: state.widget.enabled && index == 0 || state.value?.containsKey(0) == true
+          ? () => _handleTap(id: index)
+          : null,
+      onLongPress: state.widget.enabled && state.value?.containsKey(index) == true
+          ? () => _handleTap(id: index, remove: true)
+          : null,
+    );
   }
 
   Widget _buildImage(BuildContext context, ThemeData theme, [int index = 0]) {
@@ -150,7 +203,7 @@ class _Widget extends StatelessWidget {
           ? Icon(
               PhotoFormField.photoIcon,
               size: index == 0 ? 48.0 : 24.0,
-              color: theme.hintColor,
+              color: theme.colorScheme.background,
             )
           : null,
     );
@@ -162,37 +215,23 @@ class _Widget extends StatelessWidget {
         ) ??
         defaultIdleChild;
 
-    return DragTarget<int>(
-      builder: (context, candidateData, rejectedData) {
-        final candidate = candidateData.firstOrNull;
-        final imageIndex = candidate ?? index;
-
-        return _ImageWidget(
-          index: index,
-          idleChild: idleChild,
-          borderRadius: borderRadius,
-          interactive: interactive,
-          imageProvider: state.value?[imageIndex]?.map(
-            local: (value) => FileImage(value.file),
-            online: (value) => value.imageProvider,
-          ),
-          onTap: state.widget.enabled && index == 0 || state.value?.containsKey(0) == true
-              ? () => _handleTap(id: index)
-              : null,
-          onLongPress: state.widget.enabled && state.value?.containsKey(index) == true
-              ? () => _handleTap(id: index, remove: true)
-              : null,
-        );
-      },
-      onAccept: (acceptedIndex) {
-        final newValue = Map<int, PhotoFormFieldValue?>.from(state.value ?? const <int, PhotoFormFieldValue?>{});
-        final currentIndexValue = newValue[index];
-        newValue[index] = newValue[acceptedIndex];
-        newValue[acceptedIndex] = currentIndexValue;
-        state.didChange(newValue);
-        Feedback.forLongPress(context);
-      },
-    );
+    return !enableReorder || singlePhoto
+        ? _buildImageWidget(context, index, index, idleChild)
+        : DragTarget<int>(
+            builder: (context, candidateData, rejectedData) {
+              final candidate = candidateData.firstOrNull;
+              final imageIndex = candidate ?? index;
+              return _buildImageWidget(context, index, imageIndex, idleChild);
+            },
+            onAccept: (acceptedIndex) {
+              final newValue = Map<int, PhotoFormFieldValue?>.from(state.value ?? const <int, PhotoFormFieldValue?>{});
+              final currentIndexValue = newValue[index];
+              newValue[index] = newValue[acceptedIndex];
+              newValue[acceptedIndex] = currentIndexValue;
+              state.didChange(newValue);
+              Feedback.forLongPress(context);
+            },
+          );
   }
 
   @override
@@ -296,15 +335,19 @@ class _ImageWidget extends StatelessWidget {
     required this.interactive,
     required this.onTap,
     required this.onLongPress,
+    this.draggable = false,
+    this.shape,
   }) : super(key: key);
 
   final int index;
   final ImageProvider? imageProvider;
   final Widget idleChild;
   final BorderRadius? borderRadius;
+  final ShapeBorder? shape;
   final bool interactive;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final bool draggable;
 
   Widget _buildImage(
     ImageProvider? imageProvider,
@@ -322,13 +365,18 @@ class _ImageWidget extends StatelessWidget {
     Widget widget = SwitchingFirebaseImage(
       imageProvider: image,
       type: interactive ? SwitchingImageType.scale : SwitchingImageType.fade,
+      duration: const Duration(milliseconds: 300),
+      curve: decelerateEasing,
       idleChild: idleChild,
       borderRadius: borderRadius,
+      shape: shape,
+      expandBox: true,
     );
 
     if (interactive) {
       widget = OverlayedInkWell(
         borderRadius: borderRadius,
+        shape: shape,
         child: widget,
         onTap: onTap,
         onLongPress: onLongPress,
@@ -349,7 +397,7 @@ class _ImageWidget extends StatelessWidget {
             interactive: interactive,
           );
 
-          return interactive
+          return interactive && draggable
               ? Draggable<int>(
                   data: index,
                   maxSimultaneousDrags: imageProvider != null ? 1 : 0, // Disable while there's no image.
