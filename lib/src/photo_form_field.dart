@@ -37,6 +37,7 @@ class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue?>> {
     BorderRadius? secondaryBorderRadius,
     ShapeBorder? secondaryShape,
     Duration switchDuration = const Duration(milliseconds: 250),
+    Axis? draggableAffinity = Axis.horizontal,
   }) : super(
           onSaved: onSaved,
           validator: validator,
@@ -56,6 +57,7 @@ class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue?>> {
             switchDuration: switchDuration,
             enableReorder: enableReorder,
             onChanged: onChanged,
+            draggableAffinity: draggableAffinity,
           ),
         );
 
@@ -99,6 +101,7 @@ class _Widget extends StatelessWidget {
     this.shape,
     this.secondaryShape,
     this.onChanged,
+    this.draggableAffinity = Axis.horizontal,
   }) : super(key: key);
 
   final FormFieldState<Map<int, PhotoFormFieldValue?>> state;
@@ -113,6 +116,7 @@ class _Widget extends StatelessWidget {
   final BorderRadius? secondaryBorderRadius;
   final ShapeBorder? secondaryShape;
   final FormFieldSetter<Map<int, PhotoFormFieldValue?>>? onChanged;
+  final Axis? draggableAffinity;
 
   static final _log = Log.named('PhotoFormField');
 
@@ -180,6 +184,7 @@ class _Widget extends StatelessWidget {
       shape: shape,
       interactive: interactive,
       draggable: enableReorder && !singlePhoto,
+      draggableAffinity: draggableAffinity,
       imageProvider: state.value?[imageIndex]?.map(
         local: (value) => FileImage(value.file),
         online: (value) => value.imageProvider,
@@ -194,16 +199,15 @@ class _Widget extends StatelessWidget {
   }
 
   Widget _buildImage(BuildContext context, ThemeData theme, [int index = 0]) {
-    final defaultIdleChild = AnimatedContainer(
-      duration: switchDuration,
-      curve: standardEasing,
+    final defaultIdleChild = ColoredBox(
       color: theme.backgroundColor,
-      alignment: Alignment.center,
       child: interactive
-          ? Icon(
-              PhotoFormField.photoIcon,
-              size: index == 0 ? 48.0 : 24.0,
-              color: theme.colorScheme.background,
+          ? Center(
+              child: Icon(
+                PhotoFormField.photoIcon,
+                size: index == 0 ? 48.0 : 24.0,
+                color: theme.dividerColor,
+              ),
             )
           : null,
     );
@@ -337,6 +341,7 @@ class _ImageWidget extends StatelessWidget {
     required this.onLongPress,
     this.draggable = false,
     this.shape,
+    this.draggableAffinity = Axis.horizontal,
   }) : super(key: key);
 
   final int index;
@@ -348,6 +353,7 @@ class _ImageWidget extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final bool draggable;
+  final Axis? draggableAffinity;
 
   Widget _buildImage(
     ImageProvider? imageProvider,
@@ -371,6 +377,8 @@ class _ImageWidget extends StatelessWidget {
       borderRadius: borderRadius,
       shape: shape,
       expandBox: true,
+      inherit: true,
+      wrapInheritBoundary: true,
     );
 
     if (interactive) {
@@ -402,6 +410,7 @@ class _ImageWidget extends StatelessWidget {
                   data: index,
                   maxSimultaneousDrags: imageProvider != null ? 1 : 0, // Disable while there's no image.
                   ignoringFeedbackSemantics: true,
+                  affinity: draggableAffinity,
                   rootOverlay: true,
                   dragAnchorStrategy: (_, __, ___) => const Offset(56.0, 56.0) / 2,
                   onDragStarted: () => Feedback.forLongPress(context),
