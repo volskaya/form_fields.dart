@@ -4,6 +4,7 @@ import 'package:fancy_switcher/fancy_switcher.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_image/firebase_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:form_fields/src/overlayed_ink_well.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:log/log.dart';
@@ -129,6 +130,11 @@ class _Widget extends StatelessWidget {
     }
   }
 
+  void _handleStateChange(Map<int, PhotoFormFieldValue?>? value) {
+    state.didChange(value);
+    onChanged?.call(value);
+  }
+
   Future _handleTap({int id = 0, bool remove = false}) async {
     final photos = !remove ? await _pickImages(singlePhoto) : null;
     final remainingPhotos = !singlePhoto ? 4 - id : 0;
@@ -137,7 +143,7 @@ class _Widget extends StatelessWidget {
       return _log.w('Picker returned no image, skipping…');
     } else if (id == 0 && photos == null) {
       // Main photo deleted.
-      state.didChange(const <int, PhotoFormFieldValue>{});
+      _handleStateChange(const <int, PhotoFormFieldValue>{});
     } else {
       final newValue = Map<int, PhotoFormFieldValue?>.from(state.value ?? const <int, PhotoFormFieldValue?>{});
 
@@ -160,8 +166,7 @@ class _Widget extends StatelessWidget {
         }
       }
 
-      state.didChange(newValue);
-      onChanged?.call(newValue);
+      _handleStateChange(newValue);
     }
   }
 
@@ -232,8 +237,8 @@ class _Widget extends StatelessWidget {
               final currentIndexValue = newValue[index];
               newValue[index] = newValue[acceptedIndex];
               newValue[acceptedIndex] = currentIndexValue;
-              state.didChange(newValue);
-              Feedback.forLongPress(context);
+              _handleStateChange(newValue);
+              HapticFeedback.vibrateFor(theme.platform);
             },
           );
   }
