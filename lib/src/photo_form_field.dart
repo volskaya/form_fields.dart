@@ -362,7 +362,7 @@ class _ImageWidget extends StatelessWidget {
 
   Widget _buildImage(
     ImageProvider? imageProvider,
-    Size constraints, c{
+    Size constraints, {
     VoidCallback? onTap,
     VoidCallback? onLongPress,
     bool interactive = true,
