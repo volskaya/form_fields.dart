@@ -60,7 +60,7 @@ class _Widget<T> extends StatelessWidget {
   }
 
   Widget _buildChip(T value) => ChoiceChip(
-        label: Text(getText(value), maxLines: 1, layoutTwice: true),
+        label: Text(getText(value), maxLines: 1, shrinkWrap: true),
         selected: state.value?.contains(value) == true,
         onSelected: _shouldAllowChange(value)
             ? (selected) => _handleChange(

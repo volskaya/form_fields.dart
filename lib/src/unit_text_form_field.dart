@@ -126,13 +126,13 @@ class __WidgetState<T> extends State<_Widget<T>> {
         final strings = MaterialLocalizations.of(context);
         final buttons = [
           TextButton(
-            child: Text(strings.cancelButtonLabel, layoutTwice: true),
+            child: Text(strings.cancelButtonLabel, shrinkWrap: true),
             onPressed: () => Navigator.pop(context),
           ),
           ValueListenableBuilder<T?>(
             valueListenable: notifier,
             builder: (_, selectedValue, child) => TextButton(
-              child: Text(strings.okButtonLabel, layoutTwice: true),
+              child: Text(strings.okButtonLabel, shrinkWrap: true),
               onPressed:
                   (widget.toggleable || selectedValue != null) && (widget.getValueState?.call(selectedValue) ?? true)
                       ? () => Navigator.pop(context, notifier.value)

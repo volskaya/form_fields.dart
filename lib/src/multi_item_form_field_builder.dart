@@ -136,13 +136,13 @@ class _Widget<T> extends StatelessWidget {
         );
         final buttons = [
           TextButton(
-            child: Text(strings.cancelButtonLabel, layoutTwice: true),
+            child: Text(strings.cancelButtonLabel, shrinkWrap: true),
             onPressed: () => Navigator.pop(context),
           ),
           ValueListenableBuilder<Set<T>?>(
             valueListenable: notifier,
             builder: (_, selectedValue, child) => TextButton(
-              child: Text(strings.okButtonLabel, layoutTwice: true),
+              child: Text(strings.okButtonLabel, shrinkWrap: true),
               onPressed: selectedValue != null ? () => Navigator.pop(context, selectedValue) : null,
             ),
           ),

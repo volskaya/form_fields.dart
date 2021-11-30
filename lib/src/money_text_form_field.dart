@@ -134,7 +134,7 @@ class __WidgetState extends State<_Widget> {
                 child: Text(
                   widget.currency!,
                   style: theme.textTheme.overline!.apply(color: theme.hintColor),
-                  layoutTwice: true,
+                  shrinkWrap: true,
                 ),
               )
             : null,

@@ -253,7 +253,7 @@ class EditableChipState extends State<EditableChip>
         shape: const StadiumBorder(),
         label: AnimatedBuilder(
           animation: _controller,
-          builder: (_, __) => Text(_controller.text, layoutTwice: true),
+          builder: (_, __) => Text(_controller.text, shrinkWrap: true),
         ),
         onDeleted: widget.onDeleted,
         onPressed: () {

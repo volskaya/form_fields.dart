@@ -5,10 +5,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_image/firebase_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:form_fields/src/overlayed_ink_well.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:log/log.dart';
 import 'package:quiver/strings.dart';
+import 'package:utils/utils.dart';
 
 part 'photo_form_field.freezed.dart';
 
@@ -269,7 +269,7 @@ class _Widget extends StatelessWidget {
                   child: Text(
                     state.errorText!,
                     style: theme.textTheme.caption!.apply(color: theme.colorScheme.onSurface),
-                    layoutTwice: true,
+                    shrinkWrap: true,
                   ),
                 ),
               ),
@@ -362,7 +362,7 @@ class _ImageWidget extends StatelessWidget {
 
   Widget _buildImage(
     ImageProvider? imageProvider,
-    Size constraints, {
+    Size constraints, c{
     VoidCallback? onTap,
     VoidCallback? onLongPress,
     bool interactive = true,
@@ -387,12 +387,15 @@ class _ImageWidget extends StatelessWidget {
     );
 
     if (interactive) {
-      widget = OverlayedInkWell(
-        borderRadius: borderRadius,
-        shape: shape,
-        child: widget,
-        onTap: onTap,
-        onLongPress: onLongPress,
+      widget = InkFeaturesWidget(
+        paintForeground: true,
+        child: InkWell(
+          borderRadius: borderRadius,
+          customBorder: shape,
+          child: widget,
+          onTap: onTap,
+          onLongPress: onLongPress,
+        ),
       );
     }
 
