@@ -262,7 +262,7 @@ class EditableChipState extends State<EditableChip>
           markNeedsBuild();
 
           // Switcher hasn't built the input field at this point.
-          WidgetsBinding.instance!.addPostFrameCallback((_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) _focusNode.requestFocus();
           });
         },

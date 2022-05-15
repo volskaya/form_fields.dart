@@ -1,15 +1,18 @@
 import 'package:animations/animations.dart';
 import 'package:country_catalog/country_catalog.dart';
 import 'package:fancy_switcher/fancy_switcher.dart';
+import 'package:flutter/material.dart';
 import 'package:form_fields/src/l10n/form_fields_localizations.dart';
 import 'package:form_fields/src/typedefs.dart';
 import 'package:material_dialog/material_dialog.dart';
+import 'package:quiver/strings.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:utils/utils.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:quiver/strings.dart';
+
+typedef CountryTextFormFieldPickerCallback = Future<Country?> Function(
+  BuildContext context,
+  Country? initialValue,
+);
 
 class CountryTextFormField extends FormField<Country> {
   CountryTextFormField({
@@ -25,6 +28,7 @@ class CountryTextFormField extends FormField<Country> {
     InputDecoration? decoration,
     TextStyle? style,
     FormFieldAttachmentBuilder? attachmentBuilder,
+    CountryTextFormFieldPickerCallback? pickCountry,
   }) : super(
           key: key,
           onSaved: onSaved,
@@ -40,6 +44,7 @@ class CountryTextFormField extends FormField<Country> {
             decoration: decoration,
             style: style,
             attachmentBuilder: attachmentBuilder,
+            pickCountry: pickCountry,
           ),
         );
 
@@ -55,6 +60,7 @@ class _Widget extends StatefulWidget {
     this.decoration,
     this.style,
     this.attachmentBuilder,
+    this.pickCountry,
   });
 
   final FormFieldState<Country> state;
@@ -64,6 +70,7 @@ class _Widget extends StatefulWidget {
   final InputDecoration? decoration;
   final TextStyle? style;
   final FormFieldAttachmentBuilder? attachmentBuilder;
+  final CountryTextFormFieldPickerCallback? pickCountry;
 
   @override
   __WidgetState createState() => __WidgetState();
@@ -77,110 +84,119 @@ class __WidgetState extends State<_Widget> with InitialDependencies {
   bool _shouldDisposeFocusNode = false;
 
   void _updateCountry([Country? country]) {
-    _controller.text = country?.name != null ? Country.localize(context, country!) : '';
     widget.onChanged?.call(country);
-    widget.state.didChange(country);
+
+    if (mounted) {
+      _controller.text = country?.name != null ? Country.localize(context, country!) : '';
+      widget.state.didChange(country);
+    }
   }
 
   Future _pickCountry() async {
-    final scrollController = ScrollController();
-    final scrollToggle = ScrollControllerToggle(controller: scrollController);
-    final notifier = ValueNotifier<Country?>(widget.state.value);
-    final attachment = widget.attachmentBuilder?.call(context, 'country_text_form_field');
+    Country? pickedCountry;
 
-    final pickedCountry = await showModal<Country>(
-        context: context,
-        builder: (context) {
-          final theme = Theme.of(context);
-          final strings = MaterialLocalizations.of(context);
-          final buttons = [
-            TextButton(
-              child: Text(strings.cancelButtonLabel, shrinkWrap: true),
-              onPressed: () => Navigator.pop(context),
-            ),
-            ValueListenableBuilder<Country?>(
-              valueListenable: notifier,
-              builder: (_, selectedValue, child) => TextButton(
-                child: Text(strings.okButtonLabel, shrinkWrap: true),
-                onPressed: selectedValue != null ? () => Navigator.pop(context, notifier.value) : null,
+    if (widget.pickCountry != null) {
+      pickedCountry = await widget.pickCountry!(context, widget.state.value);
+    } else {
+      final scrollController = ScrollController();
+      final scrollToggle = ScrollControllerToggle(controller: scrollController);
+      final notifier = ValueNotifier<Country?>(widget.state.value);
+      final attachment = widget.attachmentBuilder?.call(context, 'country_text_form_field');
+
+      pickedCountry = await showModal<Country>(
+          context: context,
+          builder: (context) {
+            final theme = Theme.of(context);
+            final strings = MaterialLocalizations.of(context);
+            final buttons = [
+              TextButton(
+                child: Text(strings.cancelButtonLabel, shrinkWrap: true),
+                onPressed: () => Navigator.pop(context),
               ),
-            ),
-          ];
-
-          final content = UnboundedCustomScrollView(
-            controller: scrollController,
-            slivers: [
-              SliverFixedExtentList(
-                itemExtent: 56.0,
-                delegate: SliverChildBuilderDelegate(
-                  (context, i) {
-                    final country = CountryCatalog.countries[i];
-                    final title = Text(Country.localize(context, country), overflow: TextOverflow.ellipsis);
-                    final flag = SizedBox(
-                      height: 24.0,
-                      width: 24.0,
-                      child: DisposableBuildContextBuilder(
-                        builder: (_, context) => SwitchingImage(
-                          imageProvider: ScrollAwareImageProvider(
-                            context: context,
-                            imageProvider: Country.imageOf(country),
-                          ),
-                          idleChild: Center(
-                            child: Icon(CountryTextFormField.flagIcon, size: 12),
-                          ),
-                          type: SwitchingImageType.fade,
-                          duration: const Duration(milliseconds: 300),
-                          curve: decelerateEasing,
-                          fit: BoxFit.contain,
-                          filterQuality: FilterQuality.none,
-                          addRepaintBoundary: false,
-                          optimizeFade: true,
-                        ),
-                      ),
-                    );
-
-                    return ValueListenableBuilder<Country?>(
-                      valueListenable: notifier,
-                      builder: (_, selectedValue, ___) => RadioListTile<Country>(
-                        contentPadding: const EdgeInsets.only(left: 12, right: 24),
-                        onChanged: (val) => notifier.value = val,
-                        value: country,
-                        groupValue: selectedValue,
-                        activeColor: theme.colorScheme.primary,
-                        title: title,
-                        secondary: flag,
-                      ),
-                    );
-                  },
-                  addAutomaticKeepAlives: false,
-                  childCount: CountryCatalog.countries.length,
+              ValueListenableBuilder<Country?>(
+                valueListenable: notifier,
+                builder: (_, selectedValue, child) => TextButton(
+                  child: Text(strings.okButtonLabel, shrinkWrap: true),
+                  onPressed: selectedValue != null ? () => Navigator.pop(context, notifier.value) : null,
                 ),
               ),
-            ],
-          );
+            ];
 
-          return ProxyWidgetBuilder(
-            onUnmounted: () {
-              scrollToggle.dispose();
-              scrollController.dispose();
-              notifier.dispose();
-            },
-            child: ValueListenableBuilder<bool>(
-              valueListenable: scrollToggle,
-              builder: (context, overlapsContent, ___) => MaterialDialogContainer(
-                title: Text(FormFieldsLocalizations.of(context)?.countryDialogTitle ?? 'Country'),
-                content: content,
-                overlapsContent: overlapsContent,
-                buttons: buttons,
-                attachment: attachment,
+            final content = UnboundedCustomScrollView(
+              controller: scrollController,
+              slivers: [
+                SliverFixedExtentList(
+                  itemExtent: 56.0,
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) {
+                      final country = CountryCatalog.countries[i];
+                      final title = Text(Country.localize(context, country), overflow: TextOverflow.ellipsis);
+                      final flag = SizedBox(
+                        height: 24.0,
+                        width: 24.0,
+                        child: DisposableBuildContextBuilder(
+                          builder: (_, context) => SwitchingImage(
+                            imageProvider: ScrollAwareImageProvider(
+                              context: context,
+                              imageProvider: Country.imageOf(country),
+                            ),
+                            idleChild: Center(
+                              child: Icon(CountryTextFormField.flagIcon, size: 12),
+                            ),
+                            type: SwitchingImageType.fade,
+                            duration: const Duration(milliseconds: 300),
+                            curve: decelerateEasing,
+                            fit: BoxFit.contain,
+                            filterQuality: FilterQuality.none,
+                            addRepaintBoundary: false,
+                            optimizeFade: true,
+                          ),
+                        ),
+                      );
+
+                      return ValueListenableBuilder<Country?>(
+                        valueListenable: notifier,
+                        builder: (_, selectedValue, ___) => RadioListTile<Country>(
+                          contentPadding: const EdgeInsets.only(left: 12, right: 24),
+                          onChanged: (val) => notifier.value = val,
+                          value: country,
+                          groupValue: selectedValue,
+                          activeColor: theme.colorScheme.primary,
+                          title: title,
+                          secondary: flag,
+                        ),
+                      );
+                    },
+                    addAutomaticKeepAlives: false,
+                    childCount: CountryCatalog.countries.length,
+                  ),
+                ),
+              ],
+            );
+
+            return ProxyWidgetBuilder(
+              onUnmounted: () {
+                scrollToggle.dispose();
+                scrollController.dispose();
+                notifier.dispose();
+              },
+              child: ValueListenableBuilder<bool>(
+                valueListenable: scrollToggle,
+                builder: (context, overlapsContent, ___) => MaterialDialogContainer(
+                  title: Text(FormFieldsLocalizations.of(context)?.countryDialogTitle ?? 'Country'),
+                  content: content,
+                  overlapsContent: overlapsContent,
+                  buttons: buttons,
+                  attachment: attachment,
+                ),
               ),
-            ),
-          );
-        });
+            );
+          });
+    }
 
     if (pickedCountry != null) _updateCountry(pickedCountry);
     if (widget.state.value == null)
-      WidgetsBinding.instance!.addPostFrameCallback(
+      WidgetsBinding.instance.addPostFrameCallback(
         (_) => mounted ? _focusNode.unfocus() : null,
       );
   }

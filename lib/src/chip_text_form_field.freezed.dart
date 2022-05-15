@@ -1,5 +1,7 @@
+// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'chip_text_form_field.dart';
 
@@ -10,26 +12,7 @@ part of 'chip_text_form_field.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
-
-/// @nodoc
-class _$_ChipTearOff {
-  const _$_ChipTearOff();
-
-  __Chip call(
-      {required GlobalKey<EditableChipState> key,
-      required TextEditingController controller,
-      required FocusNode focusNode}) {
-    return __Chip(
-      key: key,
-      controller: controller,
-      focusNode: focusNode,
-    );
-  }
-}
-
-/// @nodoc
-const _$Chip = _$_ChipTearOff();
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$_Chip {
@@ -83,9 +66,9 @@ class __$ChipCopyWithImpl<$Res> implements _$ChipCopyWith<$Res> {
 }
 
 /// @nodoc
-abstract class _$_ChipCopyWith<$Res> implements _$ChipCopyWith<$Res> {
-  factory _$_ChipCopyWith(__Chip value, $Res Function(__Chip) then) =
-      __$_ChipCopyWithImpl<$Res>;
+abstract class _$$__ChipCopyWith<$Res> implements _$ChipCopyWith<$Res> {
+  factory _$$__ChipCopyWith(_$__Chip value, $Res Function(_$__Chip) then) =
+      __$$__ChipCopyWithImpl<$Res>;
   @override
   $Res call(
       {GlobalKey<EditableChipState> key,
@@ -94,13 +77,13 @@ abstract class _$_ChipCopyWith<$Res> implements _$ChipCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$_ChipCopyWithImpl<$Res> extends __$ChipCopyWithImpl<$Res>
-    implements _$_ChipCopyWith<$Res> {
-  __$_ChipCopyWithImpl(__Chip _value, $Res Function(__Chip) _then)
-      : super(_value, (v) => _then(v as __Chip));
+class __$$__ChipCopyWithImpl<$Res> extends __$ChipCopyWithImpl<$Res>
+    implements _$$__ChipCopyWith<$Res> {
+  __$$__ChipCopyWithImpl(_$__Chip _value, $Res Function(_$__Chip) _then)
+      : super(_value, (v) => _then(v as _$__Chip));
 
   @override
-  __Chip get _value => super._value as __Chip;
+  _$__Chip get _value => super._value as _$__Chip;
 
   @override
   $Res call({
@@ -108,7 +91,7 @@ class __$_ChipCopyWithImpl<$Res> extends __$ChipCopyWithImpl<$Res>
     Object? controller = freezed,
     Object? focusNode = freezed,
   }) {
-    return _then(__Chip(
+    return _then(_$__Chip(
       key: key == freezed
           ? _value.key
           : key // ignore: cast_nullable_to_non_nullable
@@ -126,6 +109,7 @@ class __$_ChipCopyWithImpl<$Res> extends __$ChipCopyWithImpl<$Res>
 }
 
 /// @nodoc
+
 class _$__Chip extends __Chip {
   const _$__Chip(
       {required this.key, required this.controller, required this.focusNode})
@@ -146,35 +130,32 @@ class _$__Chip extends __Chip {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is __Chip &&
-            (identical(other.key, key) ||
-                const DeepCollectionEquality().equals(other.key, key)) &&
-            (identical(other.controller, controller) ||
-                const DeepCollectionEquality()
-                    .equals(other.controller, controller)) &&
-            (identical(other.focusNode, focusNode) ||
-                const DeepCollectionEquality()
-                    .equals(other.focusNode, focusNode)));
+        (other.runtimeType == runtimeType &&
+            other is _$__Chip &&
+            const DeepCollectionEquality().equals(other.key, key) &&
+            const DeepCollectionEquality()
+                .equals(other.controller, controller) &&
+            const DeepCollectionEquality().equals(other.focusNode, focusNode));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(key) ^
-      const DeepCollectionEquality().hash(controller) ^
-      const DeepCollectionEquality().hash(focusNode);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(key),
+      const DeepCollectionEquality().hash(controller),
+      const DeepCollectionEquality().hash(focusNode));
 
   @JsonKey(ignore: true)
   @override
-  _$_ChipCopyWith<__Chip> get copyWith =>
-      __$_ChipCopyWithImpl<__Chip>(this, _$identity);
+  _$$__ChipCopyWith<_$__Chip> get copyWith =>
+      __$$__ChipCopyWithImpl<_$__Chip>(this, _$identity);
 }
 
 abstract class __Chip extends _Chip {
   const factory __Chip(
-      {required GlobalKey<EditableChipState> key,
-      required TextEditingController controller,
-      required FocusNode focusNode}) = _$__Chip;
+      {required final GlobalKey<EditableChipState> key,
+      required final TextEditingController controller,
+      required final FocusNode focusNode}) = _$__Chip;
   const __Chip._() : super._();
 
   @override
@@ -185,5 +166,6 @@ abstract class __Chip extends _Chip {
   FocusNode get focusNode => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$_ChipCopyWith<__Chip> get copyWith => throw _privateConstructorUsedError;
+  _$$__ChipCopyWith<_$__Chip> get copyWith =>
+      throw _privateConstructorUsedError;
 }

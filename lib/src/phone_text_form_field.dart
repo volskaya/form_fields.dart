@@ -3,15 +3,14 @@ import 'dart:math' as math;
 import 'package:animations/animations.dart';
 import 'package:country_catalog/country_catalog.dart';
 import 'package:fancy_switcher/fancy_switcher.dart';
-import 'package:form_fields/src/l10n/form_fields_localizations.dart';
-import 'package:form_fields/src/typedefs.dart';
-import 'package:utils/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:form_fields/src/l10n/form_fields_localizations.dart';
+import 'package:form_fields/src/typedefs.dart';
 import 'package:material_dialog/material_dialog.dart';
 import 'package:quiver/strings.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:utils/utils.dart';
 
 class PhoneTextFormField extends FormField<String> {
   PhoneTextFormField({
@@ -208,7 +207,7 @@ class __WidgetState extends State<_Widget> {
 
     if (pickedCountry != null) _updateCountry(pickedCountry);
     if (widget.state.value == null)
-      WidgetsBinding.instance!.addPostFrameCallback(
+      WidgetsBinding.instance.addPostFrameCallback(
         (_) => mounted ? _focusNode.unfocus() : null,
       );
   }

@@ -1,8 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:form_fields/src/currency_text_input_formatter.dart';
 import 'package:form_fields/src/typedefs.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class MoneyTextFormField extends FormField<int> {
   MoneyTextFormField({

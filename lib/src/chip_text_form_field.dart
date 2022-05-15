@@ -1,5 +1,5 @@
-import 'package:form_fields/src/editable_chip.dart';
 import 'package:flutter/material.dart';
+import 'package:form_fields/src/editable_chip.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -151,7 +151,7 @@ class __WidgetState extends State<_Widget> {
     if (!requestFocus && !scrollToEnd) return;
 
     // Focus change animates the [EditableChip] from text field to a chip.
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (requestFocus) {
         if (chip.controller.text.isEmpty) chip.focusNode.requestFocus();
@@ -159,7 +159,7 @@ class __WidgetState extends State<_Widget> {
 
       if (scrollToEnd) {
         // Needs another frame for the correct scroll extent.
-        WidgetsBinding.instance!.addPostFrameCallback((_) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
           // Use duration and curve from [EditableText._caretAnimation].
           _scrollController.animateTo(
@@ -176,7 +176,7 @@ class __WidgetState extends State<_Widget> {
     final removed = _chips.remove(chip);
     if (removed) {
       markNeedsBuild();
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) chip.dispose();
       });
     }

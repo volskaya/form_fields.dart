@@ -1,7 +1,5 @@
 import 'package:animations/animations.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:form_fields/src/typedefs.dart';
 import 'package:material_dialog/material_dialog.dart';
 import 'package:refresh_storage/refresh_storage.dart';
@@ -119,7 +117,7 @@ class __WidgetState extends State<_Widget> {
 
     if (value != null) _updateValue(value);
     if (widget.state.value == null)
-      WidgetsBinding.instance!.addPostFrameCallback((_) => mounted ? _focusNode.unfocus() : null);
+      WidgetsBinding.instance.addPostFrameCallback((_) => mounted ? _focusNode.unfocus() : null);
   }
 
   @override

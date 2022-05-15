@@ -1,10 +1,9 @@
 import 'package:animations/animations.dart';
-import 'package:form_fields/src/typedefs.dart';
-import 'package:utils/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:form_fields/src/typedefs.dart';
 import 'package:material_dialog/material_dialog.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:utils/utils.dart';
 
 class MultiUnitTextFormField<T> extends FormField<Set<T>> {
   MultiUnitTextFormField({
@@ -198,7 +197,7 @@ class __WidgetState<T> extends State<_Widget<T>> {
 
     _updateValue(value);
     if ((widget.state.value?.isEmpty ?? true) == true)
-      WidgetsBinding.instance!.addPostFrameCallback((_) => mounted ? _focusNode.unfocus() : null);
+      WidgetsBinding.instance.addPostFrameCallback((_) => mounted ? _focusNode.unfocus() : null);
   }
 
   @override

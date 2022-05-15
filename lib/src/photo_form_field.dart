@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:fancy_switcher/fancy_switcher.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_image/firebase_image.dart';
@@ -13,6 +14,7 @@ import 'package:utils/utils.dart';
 part 'photo_form_field.freezed.dart';
 
 typedef PhotoFormFieldIdleBuilder = Widget Function(BuildContext context, Widget child, String? error);
+typedef PhotoFormFieldWrapBuilder = Widget Function(BuildContext context, Widget child);
 
 @freezed
 class PhotoFormFieldValue with _$PhotoFormFieldValue {
@@ -37,6 +39,8 @@ class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue?>> {
     ShapeBorder? shape,
     BorderRadius? secondaryBorderRadius,
     ShapeBorder? secondaryShape,
+    PhotoFormFieldWrapBuilder? wrap,
+    PhotoFormFieldWrapBuilder? secondaryWrap,
     Duration switchDuration = const Duration(milliseconds: 250),
     Axis? draggableAffinity = Axis.horizontal,
   }) : super(
@@ -55,6 +59,8 @@ class PhotoFormField extends FormField<Map<int, PhotoFormFieldValue?>> {
             shape: shape,
             secondaryBorderRadius: secondaryBorderRadius,
             secondaryShape: secondaryShape,
+            wrap: wrap,
+            secondaryWrap: secondaryWrap,
             switchDuration: switchDuration,
             enableReorder: enableReorder,
             onChanged: onChanged,
@@ -101,6 +107,8 @@ class _Widget extends StatelessWidget {
     this.secondaryBorderRadius,
     this.shape,
     this.secondaryShape,
+    this.wrap,
+    this.secondaryWrap,
     this.onChanged,
     this.draggableAffinity = Axis.horizontal,
   }) : super(key: key);
@@ -116,6 +124,8 @@ class _Widget extends StatelessWidget {
   final ShapeBorder? shape;
   final BorderRadius? secondaryBorderRadius;
   final ShapeBorder? secondaryShape;
+  final PhotoFormFieldWrapBuilder? wrap;
+  final PhotoFormFieldWrapBuilder? secondaryWrap;
   final FormFieldSetter<Map<int, PhotoFormFieldValue?>>? onChanged;
   final Axis? draggableAffinity;
 
@@ -170,16 +180,19 @@ class _Widget extends StatelessWidget {
     }
   }
 
-  Widget _buildImageWidget(BuildContext _, int index, int imageIndex, Widget idleChild) {
+  Widget _buildImageWidget(BuildContext context, int index, int imageIndex, Widget idleChild) {
     ShapeBorder? shape;
     BorderRadius? borderRadius;
+    PhotoFormFieldWrapBuilder? wrap;
 
     if (index > 0 && (secondaryBorderRadius != null || secondaryShape != null)) {
       shape = secondaryShape;
       borderRadius = secondaryBorderRadius;
+      wrap = secondaryWrap;
     } else {
       shape = this.shape;
       borderRadius = this.borderRadius;
+      wrap = this.wrap;
     }
 
     return _ImageWidget(
@@ -190,6 +203,7 @@ class _Widget extends StatelessWidget {
       interactive: interactive,
       draggable: enableReorder && !singlePhoto,
       draggableAffinity: draggableAffinity,
+      wrap: wrap,
       imageProvider: state.value?[imageIndex]?.map(
         local: (value) => FileImage(value.file),
         online: (value) => value.imageProvider,
@@ -288,43 +302,36 @@ class _Widget extends StatelessWidget {
               mainPhoto,
 
               // Secondary photos.
-              Padding(
-                padding: secondaryPhotoPadding,
-                child: AnimatedCrossFade(
-                  duration: switchDuration,
-                  alignment: Alignment.topCenter,
-                  sizeCurve: standardEasing,
-                  firstCurve: standardEasing,
-                  secondCurve: standardEasing,
-                  crossFadeState: state.value?.containsKey(0) == true && (interactive || state.value!.length >= 2)
-                      ? CrossFadeState.showSecond
-                      : CrossFadeState.showFirst,
-                  firstChild: const SizedBox(width: double.infinity),
-                  secondChild: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ...List<Widget>.generate(
-                            PhotoFormField.maxSecondaryPhotos,
-                            (index) => Flexible(
-                              flex: 1,
-                              child: AspectRatio(
-                                aspectRatio: 1,
-                                child: _buildImage(context, theme, index + 1),
-                              ),
-                            ),
-                            growable: false,
-                          ).expand((widget) sync* {
-                            yield const SizedBox(width: 8);
-                            yield widget;
-                          }).skip(1),
-                        ],
-                      )
+              AnimatedCrossFade(
+                duration: switchDuration,
+                alignment: Alignment.topCenter,
+                sizeCurve: standardEasing,
+                firstCurve: standardEasing,
+                secondCurve: standardEasing,
+                crossFadeState: state.value?.containsKey(0) == true && (interactive || state.value!.length >= 2)
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                firstChild: const SizedBox(width: double.infinity),
+                secondChild: Padding(
+                  padding: secondaryPhotoPadding,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ...List<Widget>.generate(
+                        PhotoFormField.maxSecondaryPhotos,
+                        (index) => Flexible(
+                          flex: 1,
+                          child: AspectRatio(
+                            aspectRatio: 1,
+                            child: _buildImage(context, theme, index + 1),
+                          ),
+                        ),
+                        growable: false,
+                      ).expand((widget) sync* {
+                        yield const SizedBox(width: 8);
+                        yield widget;
+                      }).skip(1),
                     ],
                   ),
                 ),
@@ -347,6 +354,7 @@ class _ImageWidget extends StatelessWidget {
     this.draggable = false,
     this.shape,
     this.draggableAffinity = Axis.horizontal,
+    this.wrap,
   }) : super(key: key);
 
   final int index;
@@ -359,6 +367,7 @@ class _ImageWidget extends StatelessWidget {
   final VoidCallback? onLongPress;
   final bool draggable;
   final Axis? draggableAffinity;
+  final PhotoFormFieldWrapBuilder? wrap;
 
   Widget _buildImage(
     ImageProvider? imageProvider,
@@ -384,6 +393,7 @@ class _ImageWidget extends StatelessWidget {
       expandBox: true,
       inherit: true,
       wrapInheritBoundary: true,
+      wrap: wrap,
     );
 
     if (interactive) {

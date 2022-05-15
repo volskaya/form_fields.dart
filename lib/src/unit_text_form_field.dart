@@ -1,18 +1,31 @@
 import 'package:animations/animations.dart';
-import 'package:form_fields/src/typedefs.dart';
-import 'package:utils/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:form_fields/src/typedefs.dart';
 import 'package:material_dialog/material_dialog.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:utils/utils.dart';
+
+typedef UnitTextFormFieldItemBuilder<T> = Widget Function(BuildContext context, T value);
+typedef UnitTextFormFieldTextBuilder<T> = String Function(T? value);
+typedef UnitTextFormFieldSecondaryBuilder<T> = Widget? Function(BuildContext, T value);
+typedef UnitTextFormFieldCustomValue<T> = Future<T?> Function(
+  BuildContext context,
+  List<T> items,
+  T? previousValue,
+  Widget title,
+  UnitTextFormFieldTextBuilder<T> getText,
+  UnitTextFormFieldItemBuilder<T> itemBuilder,
+  UnitTextFormFieldSecondaryBuilder? secondaryBuilder,
+);
 
 class UnitTextFormField<T> extends FormField<T> {
   UnitTextFormField({
     required List<T> items,
-    required Widget Function(BuildContext context, T value) itemBuilder,
-    required String Function(T? value) getText,
+    required UnitTextFormFieldItemBuilder<T> itemBuilder,
+    required UnitTextFormFieldTextBuilder<T> getText,
     required Widget title,
-    Widget? Function(BuildContext, T value)? secondaryBuilder,
+    UnitTextFormFieldCustomValue<T>? pickValue,
+    UnitTextFormFieldSecondaryBuilder? secondaryBuilder,
     bool Function(T? value)? getValueState,
     bool shrinkWrap = false,
     bool toggleable = false,
@@ -53,6 +66,7 @@ class UnitTextFormField<T> extends FormField<T> {
             toggleable: toggleable,
             title: title,
             attachmentBuilder: attachmentBuilder,
+            pickValue: pickValue,
           ),
         );
 }
@@ -75,6 +89,7 @@ class _Widget<T> extends StatefulWidget {
     this.toggleable = false,
     this.shrinkWrap = false,
     this.attachmentBuilder,
+    this.pickValue,
   });
 
   final FormFieldState<T> state;
@@ -84,15 +99,16 @@ class _Widget<T> extends StatefulWidget {
   final InputDecoration? decoration;
   final TextStyle? style;
   final List<T> items;
-  final Widget Function(BuildContext context, T value) itemBuilder;
-  final Widget? Function(BuildContext, T value)? secondaryBuilder;
-  final String Function(T? value) getText;
+  final UnitTextFormFieldItemBuilder<T> itemBuilder;
+  final UnitTextFormFieldSecondaryBuilder? secondaryBuilder;
+  final UnitTextFormFieldTextBuilder<T> getText;
   final Widget title;
   final bool shrinkWrap;
   final bool toggleable;
   final T? defaultValue;
   final bool Function(T? value)? getValueState;
   final FormFieldAttachmentBuilder? attachmentBuilder;
+  final UnitTextFormFieldCustomValue<T>? pickValue;
 
   @override
   __WidgetState<T> createState() => __WidgetState<T>();
@@ -107,97 +123,114 @@ class __WidgetState<T> extends State<_Widget<T>> {
 
   void _updateValue([T? value]) {
     final _value = value ?? widget.defaultValue;
-    _controller.text = _value != null ? widget.getText(_value) : '';
     widget.onChanged?.call(_value);
-    widget.state.didChange(_value);
+
+    if (mounted) {
+      _controller.text = _value != null ? widget.getText(_value) : '';
+      widget.state.didChange(_value);
+    }
   }
 
   Future _pickUnit() async {
-    final scrollController = ScrollController();
-    final scrollToggle = ScrollControllerToggle(controller: scrollController);
-    final notifier = ValueNotifier<T?>(widget.state.value);
-    final key = widget.title is Text ? (widget.title as Text).data : T.toString();
-    final attachment = widget.attachmentBuilder?.call(context, 'unit_text_form_field_ad_$key');
+    T? value;
 
-    final value = await showModal<T>(
-      context: context,
-      builder: (context) {
-        final theme = Theme.of(context);
-        final strings = MaterialLocalizations.of(context);
-        final buttons = [
-          TextButton(
-            child: Text(strings.cancelButtonLabel, shrinkWrap: true),
-            onPressed: () => Navigator.pop(context),
-          ),
-          ValueListenableBuilder<T?>(
-            valueListenable: notifier,
-            builder: (_, selectedValue, child) => TextButton(
-              child: Text(strings.okButtonLabel, shrinkWrap: true),
-              onPressed:
-                  (widget.toggleable || selectedValue != null) && (widget.getValueState?.call(selectedValue) ?? true)
-                      ? () => Navigator.pop(context, notifier.value)
-                      : null,
+    if (widget.pickValue != null) {
+      value = await widget.pickValue!(
+        context,
+        widget.items,
+        widget.state.value,
+        widget.title,
+        widget.getText,
+        widget.itemBuilder,
+        widget.secondaryBuilder,
+      );
+    } else {
+      final scrollController = ScrollController();
+      final scrollToggle = ScrollControllerToggle(controller: scrollController);
+      final notifier = ValueNotifier<T?>(widget.state.value);
+      final key = widget.title is Text ? (widget.title as Text).data : T.toString();
+      final attachment = widget.attachmentBuilder?.call(context, 'unit_text_form_field_ad_$key');
+
+      value = await showModal<T>(
+        context: context,
+        builder: (context) {
+          final theme = Theme.of(context);
+          final strings = MaterialLocalizations.of(context);
+          final buttons = [
+            TextButton(
+              child: Text(strings.cancelButtonLabel, shrinkWrap: true),
+              onPressed: () => Navigator.pop(context),
             ),
-          ),
-        ];
-
-        final content = UnboundedCustomScrollView(
-          controller: scrollController,
-          shrinkWrap: widget.shrinkWrap,
-          physics: widget.shrinkWrap ? const ClampingScrollPhysics() : const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            SliverFixedExtentList(
-              itemExtent: 56.0,
-              delegate: SliverChildBuilderDelegate(
-                (context, i) {
-                  final item = widget.items[i];
-                  final child = widget.itemBuilder(context, item);
-                  final secondary = widget.secondaryBuilder?.call(context, item);
-
-                  return ValueListenableBuilder<T?>(
-                    valueListenable: notifier,
-                    builder: (_, selectedValue, ___) => RadioListTile<T>(
-                      contentPadding: const EdgeInsets.only(left: 12, right: 24),
-                      value: item,
-                      toggleable: widget.toggleable,
-                      groupValue: selectedValue,
-                      title: child,
-                      secondary: secondary,
-                      activeColor: theme.colorScheme.primary,
-                      onChanged: (widget.getValueState?.call(item) ?? true) ? (val) => notifier.value = val : null,
-                    ),
-                  );
-                },
-                addAutomaticKeepAlives: false,
-                childCount: widget.items.length,
+            ValueListenableBuilder<T?>(
+              valueListenable: notifier,
+              builder: (_, selectedValue, child) => TextButton(
+                child: Text(strings.okButtonLabel, shrinkWrap: true),
+                onPressed:
+                    (widget.toggleable || selectedValue != null) && (widget.getValueState?.call(selectedValue) ?? true)
+                        ? () => Navigator.pop(context, notifier.value)
+                        : null,
               ),
             ),
-          ],
-        );
+          ];
 
-        return ProxyWidgetBuilder(
-          onUnmounted: () {
-            scrollToggle.dispose();
-            scrollController.dispose();
-            notifier.dispose();
-          },
-          child: ValueListenableBuilder<bool>(
-            valueListenable: scrollToggle,
-            builder: (_, overlapsContent, ___) => MaterialDialogContainer(
-              title: widget.title,
-              content: content,
-              overlapsContent: overlapsContent,
-              buttons: buttons,
-              attachment: attachment,
+          final content = UnboundedCustomScrollView(
+            controller: scrollController,
+            shrinkWrap: widget.shrinkWrap,
+            physics: widget.shrinkWrap ? const ClampingScrollPhysics() : const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverFixedExtentList(
+                itemExtent: 56.0,
+                delegate: SliverChildBuilderDelegate(
+                  (context, i) {
+                    final item = widget.items[i];
+                    final child = widget.itemBuilder(context, item);
+                    final secondary = widget.secondaryBuilder?.call(context, item);
+
+                    return ValueListenableBuilder<T?>(
+                      valueListenable: notifier,
+                      builder: (_, selectedValue, ___) => RadioListTile<T>(
+                        contentPadding: const EdgeInsets.only(left: 12, right: 24),
+                        value: item,
+                        toggleable: widget.toggleable,
+                        groupValue: selectedValue,
+                        title: child,
+                        secondary: secondary,
+                        activeColor: theme.colorScheme.primary,
+                        onChanged: (widget.getValueState?.call(item) ?? true) ? (val) => notifier.value = val : null,
+                      ),
+                    );
+                  },
+                  addAutomaticKeepAlives: false,
+                  childCount: widget.items.length,
+                ),
+              ),
+            ],
+          );
+
+          return ProxyWidgetBuilder(
+            onUnmounted: () {
+              scrollToggle.dispose();
+              scrollController.dispose();
+              notifier.dispose();
+            },
+            child: ValueListenableBuilder<bool>(
+              valueListenable: scrollToggle,
+              builder: (_, overlapsContent, ___) => MaterialDialogContainer(
+                title: widget.title,
+                content: content,
+                overlapsContent: overlapsContent,
+                buttons: buttons,
+                attachment: attachment,
+              ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
+    }
 
     if (value != null) _updateValue(value);
     if (widget.state.value == null)
-      WidgetsBinding.instance!.addPostFrameCallback((_) => mounted ? _focusNode.unfocus() : null);
+      WidgetsBinding.instance.addPostFrameCallback((_) => mounted ? _focusNode.unfocus() : null);
   }
 
   @override

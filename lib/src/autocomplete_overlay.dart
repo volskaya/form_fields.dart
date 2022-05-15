@@ -1,5 +1,4 @@
 import 'package:fancy_switcher/fancy_switcher.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:utils/utils.dart';
@@ -192,8 +191,8 @@ class AutocompleteOverlayState extends State<AutocompleteOverlay> {
       final value = _text.trim();
 
       if (value.isNotEmpty) {
-        WidgetsBinding.instance!.addPostFrameCallback((_) {
-          WidgetsBinding.instance!.addPostFrameCallback((_) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) _updateQuery(value);
           });
         });

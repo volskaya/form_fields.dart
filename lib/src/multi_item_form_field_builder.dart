@@ -1,9 +1,8 @@
 import 'package:animations/animations.dart';
-import 'package:form_fields/src/typedefs.dart';
-import 'package:utils/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:form_fields/src/typedefs.dart';
 import 'package:material_dialog/material_dialog.dart';
+import 'package:utils/utils.dart';
 
 typedef MultiItemFormFieldBuilderOpenPicker<T> = Future<Set<T>> Function(BuildContext context);
 typedef MultiItemFormFieldBuilderGetToggle<T> = VoidCallback? Function(T item);
